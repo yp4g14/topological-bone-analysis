@@ -3,6 +3,7 @@ import numpy as np
 import homcloud.interface as hc
 import matplotlib.pyplot as plt
 from os import mkdir
+from os.path import exists
 
 def peristent_homology_sublevel_cubic(
     image,
@@ -23,13 +24,12 @@ def peristent_homology_sublevel_cubic(
     """
     #initialise paths
     idiagram_path=save_path+'idiagrams/'
-    mkdir(idiagram_path)
     idiagram_filename = filename[:-4]+".idiagram"
     pd_path = save_path+'persistence_diagrams/'
-    mkdir(pd_path)
-    if plot_persistence_diagrams:
-        plot_path = save_path+'plots/'
-        mkdir(plot_path)
+    plot_path = pd_path+'plots/'
+    for path in [idiagram_path, pd_path, plot_path]:
+        if not exists(path):
+            mkdir(path)
 
     # calculate sublevel set cubical homology persistence for each image
     hc.PDList.from_bitmap_levelset(
@@ -55,5 +55,6 @@ def peristent_homology_sublevel_cubic(
             # optional plot and save persistence diagrams
             if plot_persistence_diagrams:
                 pd.histogram().plot(colorbar={"type": "log"})
-                plt.savefig(f"{plot_path}PD_dim_{dim}_{idig_filename[:-9]}.svg")
+                plt.savefig(f"{plot_path}PD_dim_{dim}_{idiagram_filename[:-9]}.svg")
                 plt.close()
+
