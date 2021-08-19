@@ -5,12 +5,15 @@ from os import listdir, mkdir
 from os.path import isfile, join, exists
 
 def distribution_stats_column(df, dim, colname):
-    """Creates a dictionary summary of distribution statistics for a numeric column in a pandas dataframe.
+    """Creates a dictionary summary of distribution statistics for a numeric
+     column in a pandas dataframe.
 
     Args:
-        df (pandas DataFrame): dataframe with column specified by "colname" e.g. "birth"
+        df (pandas DataFrame): dataframe with column specified by "colname" 
+            e.g. "birth"
         dim : [0,1] dimension of persistence diagram df belongs to.
-        colname : numeric column name as string in df to be summarized with statistics.
+        colname : numeric column name as string in df to be summarized with
+             statistics.
 
     Returns:
         dictionary: statistics keyed by {dim}_{statistic}_{colname}
@@ -24,9 +27,13 @@ def distribution_stats_column(df, dim, colname):
     summary[f"{dim}_kurtosis_{colname}"] = df[colname].kurtosis()
     summary[f"{dim}_percentile_25_{colname}"] = df[colname].quantile(q=0.25)
     summary[f"{dim}_percentile_75_{colname}"] = df[colname].quantile(q=0.75)
-    summary[f"{dim}_iqr_{colname}"] = summary[f"{dim}_percentile_75_{colname}"] - summary[f"{dim}_percentile_25_{colname}"]
+    summary[f"{dim}_iqr_{colname}"] = \
+         summary[f"{dim}_percentile_75_{colname}"]\
+         - summary[f"{dim}_percentile_25_{colname}"]
+    
     for perc in [round(0.1*i,2) for i in range(1,10)]:
-        summary[f"{dim}_percentile_{round(100*perc)}_{colname}"] = df[colname].quantile(perc)
+        summary[f"{dim}_percentile_{round(100*perc)}_{colname}"] =\
+            df[colname].quantile(perc)
     return summary
 
 def quadrant_statistics(
@@ -38,10 +45,13 @@ def quadrant_statistics(
     per quadrant (1,2,3 as 4 naturally empty) for each dimension in dim.
 
     Args:
-        intervals (numpy array): persistence intervals as array with two columns with births, deaths
+        intervals (numpy array): persistence intervals as array 
+            with two columns 'birth', 'death'
         dim (int): persistence diagram for dimension in [0,1]
         filename (string): [description]
-        radius_split (int, optional): (for quadrant 2 dim 0 only) will calculate the number of births less than or greater than or equal to value.
+        radius_split (int, optional): (for quadrant 2 dim 0 only)
+             will calculate the number of births less than value and
+             number of births greater than or equal to value.
             Defaults to -2.
     Returns:
         pandas DataFrame: topological statistics calculated per quadrant.
@@ -61,39 +71,67 @@ def quadrant_statistics(
         stats["name"] = filename
         stats["quadrant"] = i+1
         if quadrant.shape[0] > 0:
+            # number of points
             stats[f"{dim}_num_points"] = quadrant.shape[0]
-            stats[f"{dim}_avg_birth"] = quadrant["birth"].sum()/quadrant.shape[0]
+
+            # birth statistics
+            stats[f"{dim}_avg_birth"] =\
+                 quadrant["birth"].sum()/quadrant.shape[0]
+            birth_stats = distribution_stats_column(
+                quadrant,
+                dim,
+                "birth"
+                )
+            stats.update(birth_stats)
+
             # remove inf death
             finite_quadrant = quadrant.copy(deep=True)
-            finite_quadrant = finite_quadrant.loc[finite_quadrant["death"]!=np.inf]
-            stats[f"{dim}_avg_death"] = finite_quadrant["death"].sum()/finite_quadrant.shape[0]
-            birth_stats = distribution_stats_column(quadrant,
-                                            dim,
-                                            "birth")
-            stats.update(birth_stats)
-            death_stats = distribution_stats_column(finite_quadrant,
-                                            dim,
-                                            "death")
+            finite_quadrant = finite_quadrant.loc[
+                finite_quadrant["death"]!=np.inf
+                ]
+            # death statistics
+            stats[f"{dim}_avg_death"] =\
+                 finite_quadrant["death"].sum()/finite_quadrant.shape[0]
+
+            death_stats = distribution_stats_column(
+                finite_quadrant,
+                dim,
+                "death"
+                )
             stats.update(death_stats)
             
             #lifetime = death - birth
-            finite_quadrant["lifetime"] = finite_quadrant["death"] - finite_quadrant["birth"]
-            #total persistance is the sum of all lifetimes
-            stats[f"{dim}_total_persistence"] = finite_quadrant.sum()["lifetime"]
-            # normalized_lifespan = (death - birth)/ sum_all(death-birth)
-            finite_quadrant["normalized_lifespan"] = finite_quadrant["lifetime"]/stats[f"{dim}_total_persistence"]
-            #let p be the normalised lifespan - persistent entropy can be viewed as the diversity of lifespans
-            finite_quadrant["plogp"] = finite_quadrant["normalized_lifespan"] * np.log(finite_quadrant["normalized_lifespan"])
-            stats[f"{dim}_pers_entropy"] = - finite_quadrant["plogp"].sum()
-            #number of births in quadrant 2 dim 0, less than equal to radius split, greater than radius split
-            if (i+1 == 2) and (dim==0):
-                stats[f"{dim}_num_points_less_eq_{radius_split}"] = quadrant.loc[quadrant["birth"]<=radius_split].shape[0]
-                stats[f"{dim}_num_points_greater_{radius_split}"] = quadrant.loc[quadrant["birth"]>radius_split].shape[0]
+            finite_quadrant["lifetime"] =\
+                 finite_quadrant["death"] - finite_quadrant["birth"]
 
+            #total persistance is the sum of all lifetimes
+            stats[f"{dim}_total_persistence"] =\
+                 finite_quadrant.sum()["lifetime"]
+
+            # normalized_lifespan = (death - birth)/ sum_all(death-birth)
+            finite_quadrant["normalized_lifespan"] =\
+                 finite_quadrant["lifetime"]/stats[f"{dim}_total_persistence"]
+
+            #let p be the normalised lifespan - persistent entropy 
+            # can be viewed as the diversity of lifespans
+            finite_quadrant["plogp"] = finite_quadrant["normalized_lifespan"]*\
+                np.log(finite_quadrant["normalized_lifespan"])
+            stats[f"{dim}_pers_entropy"] = - finite_quadrant["plogp"].sum()
+
+            #number of births in quadrant 2 dim 0, 
+            # less than equal to radius split and greater than radius split
+            if (i+1 == 2) and (dim==0):
+                stats[f"{dim}_num_points_less_eq_{radius_split}"] =\
+                     quadrant.loc[quadrant["birth"]<=radius_split].shape[0]
+
+                stats[f"{dim}_num_points_greater_{radius_split}"] =\
+                     quadrant.loc[quadrant["birth"]>radius_split].shape[0]
+
+            #convert to DataFrame
             stats = pd.DataFrame([stats])
             stats_list.append(stats)
 
-    # combine all stats into a DataFrame
+    # combine all stats into a single DataFrame
     if len(stats_list) != 0:
         stats_df = pd.concat(stats_list)
         return stats_df
