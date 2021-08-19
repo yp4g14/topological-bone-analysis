@@ -45,28 +45,23 @@ def otsu_threshold(image):
 def extract_patches(
     image,
     patch_shape,
-    pad_val,
-    percent_background=1.0,
-    background=0):
+    pad_val=0):
     """
     Takes a 2D image array and cuts it into non-overlapping square patches of patch_shape.
     To do this it first pads image to be exact multiples of the patch shape in each direction.
+    The image is padded with the constant pad_val, which defaults to 0
 
     Args:
         image (numpy array): numpy array of image
         patch_shape (int) : length (width) of desired square patches.
-        pad_val (int) : value in [0,1] that pads the binary image
-        percent_background (float) : percentage in [0,1] of patch that is background for it to be discarded. Default is 1.
-        set to 0 to keep all patches
-        background (int, optional) : value that is the image background
+        pad_val (int) : 
+        pad_val (int, optional): value in [0,1] that pads the binary image. Defaults to 0.
 
     Returns:
         image : (array) padded image
-        patches : (array) array of patches
-        patches[i] will return the i^th patch.
+        patches : (array) array of patches, patches[i] will return the i^th patch.
         patch_coords : list of all patch coordinates (top left per patch)
         image.shape : tuple dimensions of padded image
-
     """
     num_rows, num_cols = image.shape
 
