@@ -10,17 +10,18 @@ def peristent_homology_sublevel_cubic(
     filename,
     save_path,
     plot_persistence_diagrams=False):
-    """Calculate sublevel set cubical homology persistence for an image (or patch)
-    Input image should have already undergone SEDT for SEDT transform filtration
-    Then takes the idiagram file and pulls out the birth,death persistence intervals for two dimensions (0,1).
-    Saves the persistence intervals as csv
-    Optionally plots the persistence diagrams and saves as svg
+    """Calculate sublevel set cubical homology persistence for an image
+    Image should already have undergone SEDT for SEDT transform filtration
+    Takes the idiagram file and pulls out the birth,death persistence intervals
+    for two dimensions (0,1). Saves the persistence intervals as csv.
+    Optionally plots the persistence diagrams and saves as svg.
 
     Args:
-        image (numpy array): image values along which to take the sublevel filtration
+        image (numpy array): image values along which to take the filtration
         filename (string): filename for image as string
         save_path (string): location to save necessary files as string
-        plot_persistence_diagrams (bool, optional): If True saves plots of the persistence diagram. Defaults to False.
+        plot_persistence_diagrams (bool, optional): If True saves plots of the 
+            persistence diagram. Defaults to False.
     """
     #initialise paths
     idiagram_path=save_path+'idiagrams/'
@@ -42,6 +43,7 @@ def peristent_homology_sublevel_cubic(
     for dim in [0,1]:
         pd = hc.PDList(idiagram_path+idiagram_filename)
         pd = pd.dth_diagram(dim)
+
         # extract and save persistence intervals
         intervals = np.vstack([pd.births, pd.deaths]).transpose()
         ess_birth = list(pd.essential_births)
@@ -52,9 +54,11 @@ def peristent_homology_sublevel_cubic(
                 f"{pd_path}PD_dim_{dim}_{idiagram_filename[:-9]}.csv",
                 intervals,
                 delimiter=",")
+
             # optional plot and save persistence diagrams
             if plot_persistence_diagrams:
                 pd.histogram().plot(colorbar={"type": "log"})
-                plt.savefig(f"{plot_path}PD_dim_{dim}_{idiagram_filename[:-9]}.svg")
+                plt.savefig(
+                    f"{plot_path}PD_dim_{dim}_{idiagram_filename[:-9]}.svg"
+                    )
                 plt.close()
-
