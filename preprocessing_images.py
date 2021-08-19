@@ -2,8 +2,8 @@ import numpy as np
 from scipy import ndimage
 from math import ceil, floor
 from skimage.util import view_as_windows
+from skimage.filters import threshold_otsu
 from itertools import product
-
 
 def trim(
     image,
@@ -29,6 +29,18 @@ def trim(
     trimmed_image = image[top_trim:bottom_trim+1,left_trim:right_trim+1]
     return trimmed_image
 
+def otsu_threshold(image):
+    """Takes a grayscale image and binarises using Otsu's threshold.
+
+    Args:
+        image (numpy array): grayscale image (numpy array)
+    
+    Returns:
+        binary_image (numpy array): binary image (numpy array) with values in [0,1]
+    """
+    threshold_val = threshold_otsu(image)
+    binary_image = (image > threshold_val).astype(int)
+    return binary_image, threshold_val
 
 def extract_patches(
     image,

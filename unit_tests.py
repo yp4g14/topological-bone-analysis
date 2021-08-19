@@ -20,6 +20,25 @@ assert pre_process.trim(test_im_1_edges,edge_val=1).shape == trim_test_im_1_edge
 assert (pre_process.trim(test_im_0_edges,edge_val=0) == trim_test_im_0_edges).all(), "trim failed unit test, zero background value"
 assert (pre_process.trim(test_im_1_edges, edge_val=1) == trim_test_im_1_edges).all(), "trim failed unit test, non-zero background value"
 
+# TEST - threshold otsu
+######################################################
+test_image =  np.array([
+    [rt2,rt2,rt5,rt5],
+    [rt2,rt2,rt5,rt5],
+    [rt5,rt5,rt2,rt2],
+    [rt5,rt5,rt2,rt2]])
+test_binary = np.array([
+    [0,0,1,1],
+    [0,0,1,1],
+    [1,1,0,0],
+    [1,1,0,0]])
+
+binary_image, threshold_val = pre_process.otsu_threshold(test_image)
+
+assert (test_binary.shape == binary_image.shape), "otsu threshold, test failed binary image incorrect shape"
+assert (set(list(binary_image.flatten())) == {0,1}), "otsu threshold, test failed binary has values other than {0,1}"
+assert (test_binary == binary_image).all(), "otsu threshold, test failed binary doesn't match"
+
 # TEST  - extract_patches
 ######################################################
 test_input_im = np.array([
