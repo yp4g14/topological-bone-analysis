@@ -2,46 +2,45 @@
 import numpy as np
 import homcloud.interface as hc
 import matplotlib.pyplot as plt
+from os import mkdir
 
-def peristent_homology_sublevel_cubic(image, save_path, filename):
+def peristent_homology_sublevel_cubic(
+    image,
+    filename,
+    save_path,
+    plot_persistence_diagrams=False):
     """Calculate sublevel set cubical homology persistence for an image (or patch)
-    Input image should have undergone SEDT for SEDT transform filtration
+    Input image should have already undergone SEDT for SEDT transform filtration
+    Then takes the idiagram file and pulls out the birth,death persistence intervals for two dimensions (0,1).
+    Saves the persistence intervals as csv
+    Optionally plots the persistence diagrams and saves as svg
 
     Args:
         image (numpy array): image values along which to take the sublevel filtration
-        save_path (string): string of location to save the idiagram file
-        filename (string): string of original image name
+        filename (string): filename for image as string
+        save_path (string): location to save necessary files as string
+        plot_persistence_diagrams (bool, optional): If True saves plots of the persistence diagram. Defaults to False.
     """
+    #initialise paths
+    idiagram_path=save_path+'idiagrams/'
+    mkdir(idiagram_path)
+    idiagram_filename = filename[:-4]+".idiagram"
+    pd_path = save_path+'persistence_diagrams/'
+    mkdir(pd_path)
+    if plot_persistence_diagrams:
+        plot_path = save_path+'plots/'
+        mkdir(plot_path)
+
     # calculate sublevel set cubical homology persistence for each image
     hc.PDList.from_bitmap_levelset(
         image,
         mode="sublevel",
         type="cubical",
-        save_to=save_path+filename[:-4]+".idiagram")
+        save_to=idiagram_path+idiagram_filename)
 
-
-def extract_pd_and_intervals(
-    idig_path,
-    idig_filename,
-    interval_path,
-    pd_path=None,
-    save_persistence_diagrams=False):
-    """
-    Takes an idiagram file and pulls out the birth,death persistence intervals for two dimensions (0,1).
-    Saves the persistence intervals as csv in interval_path
-    Plots the persistence diagrams and saves as png in pd_path
-    
-    Parameters:
-    -----------
-    idig_path (string): location of .idiagram files
-    idig_filename (string): filename for .idiagram 
-    pd_path (string): location to save persistence diagrams, only if save_persistence_diagrams is True
-    interval_path (string): location as string to save persistence diagram intervals
-    logger (logging.Logger object)
-    save_persistence_diagrams (bool, optional): if True will save the persistence diagram as png in pd_path. Default is False.
-    """
+    # for dimensions 0 and 1, extract the births and deaths
     for dim in [0,1]:
-        pd = hc.PDList(idig_path+idig_filename)
+        pd = hc.PDList(idiagram_path+idiagram_filename)
         pd = pd.dth_diagram(dim)
         # extract and save persistence intervals
         intervals = np.vstack([pd.births, pd.deaths]).transpose()
@@ -49,10 +48,12 @@ def extract_pd_and_intervals(
         for i in range(len(ess_birth)):
             intervals = np.vstack((intervals, [ess_birth[i],np.inf]))
         if intervals.shape[0] > 0:
-            np.savetxt(f"{interval_path}dim_{dim}_intervals_{idig_filename[:-9]}.csv",
-                    intervals,
-                    delimiter=",")
-            if save_persistence_diagrams:
+            np.savetxt(
+                f"{pd_path}PD_dim_{dim}_{idiagram_filename[:-9]}.csv",
+                intervals,
+                delimiter=",")
+            # optional plot and save persistence diagrams
+            if plot_persistence_diagrams:
                 pd.histogram().plot(colorbar={"type": "log"})
-                plt.savefig(f"{pd_path}dim_{dim}_{idig_filename[:-9]}.png")
+                plt.savefig(f"{plot_path}PD_dim_{dim}_{idig_filename[:-9]}.svg")
                 plt.close()
