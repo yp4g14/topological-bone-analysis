@@ -1,7 +1,13 @@
 import numpy as np
 from scipy import ndimage
+from math import ceil, floor
+from skimage.util import view_as_windows
+from itertools import product
 
-def trim(image, edge_val=0):
+
+def trim(
+    image,
+    edge_val=0):
     """Trims an image array removing full rows and columns containing edge_val from the borders
 
     Args:
@@ -24,7 +30,85 @@ def trim(image, edge_val=0):
     return trimmed_image
 
 
-def SEDT(image):
+def extract_patches(
+    image,
+    patch_shape,
+    pad_val,
+    percent_background=1.0,
+    background=0):
+    """
+    Takes a 2D image array and cuts it into non-overlapping square patches of patch_shape.
+    To do this it first pads image to be exact multiples of the patch shape in each direction.
+
+    Args:
+        image (numpy array): numpy array of image
+        patch_shape (int) : length (width) of desired square patches.
+        pad_val (int) : value in [0,1] that pads the binary image
+        percent_background (float) : percentage in [0,1] of patch that is background for it to be discarded. Default is 1.
+        set to 0 to keep all patches
+        background (int, optional) : value that is the image background
+
+    Returns:
+        image : (array) padded image
+        patches : (array) array of patches
+        patches[i] will return the i^th patch.
+        patch_coords : list of all patch coordinates (top left per patch)
+        image.shape : tuple dimensions of padded image
+
+    """
+    num_rows, num_cols = image.shape
+
+    # pad image
+    if type(pad_val) != int:
+        print(f"padded value given {pad_val} is not an integer, has type {type(pad_val)}")
+    length_to_add = ceil(image.shape[0]/patch_shape)*patch_shape - image.shape[0]
+    width_to_add = ceil(image.shape[1]/patch_shape)*patch_shape - image.shape[1]
+
+    image = np.pad(image,
+                    ((ceil(length_to_add/2),floor(length_to_add/2)), (ceil(width_to_add/2),floor(width_to_add/2))),
+                    'constant',
+                    constant_values=(pad_val,pad_val))
+    num_rows, num_cols = image.shape
+    
+    # take patches of padded image
+    stride=patch_shape
+    patches = view_as_windows(image,
+                              patch_shape,
+                              stride)
+
+    p_num_rows, p_num_cols, patch_height, patch_width = patches.shape
+    num_patches = p_num_rows * p_num_cols
+    patches =  np.reshape(patches, (num_patches, patch_height, patch_width))
+    
+    # get the coordinates of all the patches
+    col_coords = np.array([])
+    base_coords = np.array([i*(patch_width) for i in range(int(num_cols/patch_width)+1)])
+    offsets = np.arange(0,patch_width, step=stride)
+    for offset in offsets:
+        starts = base_coords + offset
+        starts = starts[starts <= num_cols - patch_width]
+        col_coords = np.concatenate([col_coords, starts])
+    col_coords = np.array(sorted(col_coords))
+    
+    row_coords = np.array([])
+    base_coords = np.array([i*(patch_height) for i in range(int(num_rows/patch_height)+1)])
+    offsets = np.arange(0,patch_height, step=stride)
+    for offset in offsets:
+        starts = base_coords + offset
+        starts = starts[starts <= num_rows - patch_height]
+        row_coords = np.concatenate([row_coords, starts])
+    row_coords = np.array(sorted(row_coords))
+    
+    patch_coords = list(product(row_coords, col_coords))
+    
+    # check number of coordinates found is the same as number of patches taken
+    if patches.shape[0] != len(patch_coords):
+        print(f"{patches.shape[0]} patches found, {patch_coords} coordinates found")
+    return image, patches, patch_coords, image.shape
+
+
+def SEDT(
+    image):
     """
     Calculates a Signed Euclidean Distance Transform of an image array.
 
