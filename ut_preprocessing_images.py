@@ -52,7 +52,7 @@ test_binary = np.array([
     [1,1,0,0],
     [1,1,0,0]])
 
-binary_image, threshold_val = pre_process.otsu_threshold(test_image)
+binary_image = pre_process.otsu_threshold(test_image)
 
 assert (test_binary.shape == binary_image.shape),\
     "otsu threshold, test failed binary image incorrect shape"

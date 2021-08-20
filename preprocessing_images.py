@@ -47,7 +47,30 @@ def otsu_threshold(
     """
     threshold_val = threshold_otsu(image)
     binary_image = (image > threshold_val).astype(int)
-    return binary_image, threshold_val
+    return binary_image
+
+
+# def custom_threshold(
+#     image,
+#     threshold=10):
+#     """Calculates the custom threshold and applies to a grayscale image.
+
+#     Args:
+#         image (array): [description]
+#         threshold (int, optional): [description]. Defaults to 10.
+#     """
+#     binary_im = (image > threshold).astype(int)
+#     return binary_im
+
+# from skimage.filters import threshold_minimum
+# def minimum(
+#     image,
+#     binary_path,
+#     filename,
+#     logger):
+#     val = threshold_minimum(image)
+#     binary_im = (image > val).astype(int)
+#     return binary_im
 
 def extract_patches(
     image,
@@ -73,7 +96,6 @@ def extract_patches(
         image : (array) padded image
         patches : (array) array of patches, patches[i] will return i^th patch.
         patch_coords : list of all patch coordinates (top left per patch)
-        image.shape : tuple dimensions of padded image
     """
     num_rows, num_cols = image.shape
 
@@ -108,7 +130,7 @@ def extract_patches(
     if patches.shape[0] != len(patch_coords):
         print(f"{patches.shape[0]} patches found,\
          {patch_coords} coordinates found")
-    return image, patches, patch_coords, image.shape
+    return image, patches, patch_coords
 
 def get_coords(
     stride,

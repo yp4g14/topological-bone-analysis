@@ -133,7 +133,7 @@ def quadrant_statistics(
 
     # combine all stats into a single DataFrame
     if len(stats_list) != 0:
-        stats_df = pd.concat(stats_list)
+        stats_df = pd.concat(stats_list).reset_index(drop=True)
         return stats_df
     else:
         return None
