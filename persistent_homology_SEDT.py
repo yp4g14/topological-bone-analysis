@@ -26,8 +26,8 @@ def peristent_homology_sublevel_cubic(
     #initialise paths
     idiagram_path=save_path+'idiagrams/'
     idiagram_filename = filename[:-4]+".idiagram"
-    pd_path = save_path+'persistence_diagrams/'
-    plot_path = pd_path+'plots/'
+    pd_path = save_path+'persistence_intervals/'
+    plot_path = save_path+'persistence_diagrams/'
     for path in [idiagram_path, pd_path, plot_path]:
         if not exists(path):
             mkdir(path)

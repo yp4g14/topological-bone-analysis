@@ -40,6 +40,7 @@ def quadrant_statistics(
     intervals,
     dim,
     filename,
+    save_path,
     radius_split=-2):
     """Takes in an array of birth, death intervals and calculates statistics
     per quadrant (1,2,3 as 4 naturally empty) for each dimension in dim.
@@ -134,9 +135,8 @@ def quadrant_statistics(
     # combine all stats into a single DataFrame
     if len(stats_list) != 0:
         stats_df = pd.concat(stats_list).reset_index(drop=True)
-        return stats_df
-    else:
-        return None
+        stats_df.to_csv(
+            f"{save_path}{filename[:-4]}_statistics.csv")
 
 def combine_stats_files(
     path,
