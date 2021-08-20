@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from os import listdir, rmdir, remove
-from os.path import isfile, join
+from os.path import isfile, join, exists
 import logging
 import time
 import datetime as dt
@@ -9,7 +9,6 @@ from importlib import reload
 import pandas as pd
 import numpy as np
 from PIL import Image
-from skimage.filters import threshold_otsu
 
 # local imports
 import utils as ut
@@ -35,6 +34,7 @@ def ph_pipeline_SEDT(path,
                      patch_shape=300,
                      background_val = 0,
                      stride=150,
+                     trim=True,
                      single_file=None,
                      conf=None,
                      save_persistence_diagrams=False,
@@ -107,13 +107,12 @@ def ph_pipeline_SEDT(path,
     else:
         filenames = [file for file in listdir(path)
                         if isfile(join(path, file))]
-        tot_im = len(filenames)
-        logger.info(f"number of image files: {tot_im}")
 
     #check tif or tiff files only    
     filenames, dropped = ut.check_ext(filenames,['tif','tiff'])
+    logger.info(f"number of image files: {len(filenames)}")
     if len(dropped) > 0:
-        logger.warn(f"Files dropped incorrect extensions: {dropped}")
+        logger.warning(f"Files dropped incorrect extensions: {dropped}")
     
     # read images from filenames
     images = ut.import_images(
@@ -122,160 +121,110 @@ def ph_pipeline_SEDT(path,
         )
     logger.info(f"Imported {len(images)} images")
 
-    binary_images = []
+    # threshold to binary
     if threshold_func:
         for k in range(len(images)):
             binary_im = threshold_func(images[k])
-            binary_images.append(binary_im)
-            Image.fromarray(binary_im).save(f"{binary_path}{filenames[k]}")
+            # check images binary
+            if not np.isin(binary_im,[0,1]).all():
+                logger.error("image is not binary")
+            else:
+                Image.fromarray(binary_im).save(f"{binary_path}{filenames[k]}")
+        
     logger.info(f"Completed threshold for {len(filenames)} images")
 
-    images = binary_images
-    # check images binary
-    for image in images:
-        assert np.isin(image,[0,1]).all(), 'image is not binary'
+    binary_filenames = [file for file in listdir(binary_path)
+                        if isfile(join(binary_path, file))]
+    binary_filenames, dropped = ut.check_ext(binary_filenames,['tif','tiff'])
 
-    for image in images:
-        # trim image
-        trimmed = preprocess.trim(image,edge_val=background_val)
-        # take patches
-        image, patches, patch_coords = preprocess.extract_patches(
-            trimmed,
+    for filename in binary_filenames:
+        preprocess.image_to_patches(
+            binary_path,
+            filename,
+            patch_path,
+            logger,
             patch_shape,
-            pad_val=background_val,
-            stride=stride
-            )
-    # HERE SAVE image, PATCHES, coords IF LESS percentage_background=1.0
-        for patch in patches:
+            stride,
+            pad_val=0,
+            percentage_background=1,
+            background_val=background_val,
+            trim_first=trim,
+            edge_val=0)
 
-
-    #read in patches from patch path, so filenames in correct order
-#        patch_path = binary_path # remove!
+     #read in patches from patch path, so filenames in correct order
     patch_filenames = [file for file in listdir(patch_path)
                         if isfile(join(patch_path, file))]
-    patch_filenames = utils.check_ext(patch_filenames, logger, ['tif','tiff'])
+    patch_filenames,dropped = ut.check_ext(patch_filenames,['tif','tiff'])
+
     # Signed Euclidean Distance Transform of each patch                
-    utils.SEDT_images(patch_path,
-                        SEDT_path,
-                        logger,
-                        x=4,
-                        remove_filename=['params.txt',
-                                        'patch_coords.csv'])
+    for name in patch_filenames:
+#        patch = ut.import_images(name, )
+        SEDT_patch = preprocess.SEDT(patch)
+        Image.fromarray(SEDT_patch).save(f"{SEDT_path}{name}")
+
     
     SEDT_patch_filenames = [file for file in listdir(SEDT_path)
                             if isfile(join(SEDT_path, file))]
+    SEDT_patch_filenames = ut.check_ext(SEDT_patch_filenames,['tif','tiff'])
     
-    SEDT_patches = utils.get_grey_images(SEDT_path,
-                                            SEDT_patch_filenames,
-                                            logger)
-
     #creating idiagrams, calculates persistent homology on SEDT patches
     logger.info("starting persistence")
-    ph.grey_ph_sublevel_cubic(SEDT_path,
-                                idig_path,
-                                SEDT_patch_filenames,
-                                SEDT_patches,
-                                logger)
+
+    for SEDT_patchname in SEDT_patch_filenames:
+        SEDT_patch = ut.import_images([SEDT_patchname])
+        ph.peristent_homology_sublevel_cubic(
+            SEDT_patch,
+            SEDT_patchname,
+            run_path,
+            plot_persistence_diagrams=save_persistence_diagrams)
+
     logger.info("patches persistent homology calculated")
     
-    SEDT_patch_filenames = [file for file in listdir(SEDT_path)
-                            if isfile(join(SEDT_path, file))]
-    #finding existing idiagram files
-    idigs_to_find = [patch_name[:-4]+".idiagram" for patch_name in SEDT_patch_filenames]
-    idig_list = utils.find_files(idigs_to_find, idig_path, logger)
-
-    # get intervals
-    ph.extract_pd_and_intervals(idig_path,
-                                idig_list,
-                                interval_path,
-                                logger,
-                                pd_path,
-                                save_persistence_diagrams)
-    logger.info("intervals complete")
-
-    SEDT_patch_filenames = [file for file in listdir(SEDT_path)
-                            if isfile(join(SEDT_path, file))]
-    SEDT_patch_filenames = utils.check_ext(SEDT_patch_filenames,
-                                            logger,
-                                            ['tif','tiff'])
     #finding existing interval files
     intervals_to_find = [f"dim_{dim}_intervals_{name[:-4]}.csv"\
                             for name in SEDT_patch_filenames for dim in [0,1] ]
-    interval_files = utils.find_files(intervals_to_find,
-                                        interval_path,
-                                        logger)
-    if cleanup:
-        # remove the SEDT of patches as images
-        SEDT_files = [file for file in listdir(SEDT_path)
-                            if isfile(join(SEDT_path, file))]
-        for name in SEDT_files:
-            remove(SEDT_path+name)
-        rmdir(SEDT_path)
+    interval_files = ut.find_files(
+        intervals_to_find,
+        interval_path,
+        logger)
+
+    # check 2 files were found per filename, HERE
+
+    for interval_name in interval_files:
+        dim = int(interval_name[4])
+        intervals = pd.read_csv(interval_path+interval_name,
+                                names=["birth", "death"])
+        stats.quadrant_statistics(
+            intervals,
+            dim,
+            interval_name,
+            stats_path,
+            radius_split=-2)
     
-    # check 2 files were found per filename,
-    # if not use single dim version and lookup dictionary single_dim
-    single_dim = {}
-    two_dim = []
-    for file in SEDT_patch_filenames:
-        interval_files_match = [s for s in interval_files if file[:-4] in s]
-        if len(interval_files_match) == 2:
-            two_dim.append(file)
-        if len(interval_files_match) < 2:
-            if len(interval_files_match) == 1:
-                single_dim[file] = int(interval_files_match[0][4])
-        
-        if len(interval_files_match) > 2:
-            SEDT_patch_filenames.remove(file)
-            logger.warning(f"Will not compute statistics for {file[:-4]}\
-                            as too many files found")
 
-    for patch_name in two_dim:
-        interval_files = [f"dim_0_intervals_{patch_name[:-4]}.csv",
-                            f"dim_1_intervals_{patch_name[:-4]}.csv"]    
-        if conf is not None:
-            confidence_band=True
-        else:
-            confidence_band=False
-        st_by_Q.quad_stats_from_intervals_csv(interval_path,
-                                                interval_files,
-                                                stats_path,
-                                                patch_name,
-                                                logger,
-                                                x=4,
-                                                birth_limits=birth_limits,
-                                                confidence_band=confidence_band,
-                                                conf_c=conf)
-
-    for patch_name in list(single_dim.keys()):
-        interval_files = [f"dim_{single_dim[patch_name]}_intervals_{patch_name[:-4]}.csv"]    
-
-        st_by_Q.quad_stats_from_intervals_csv(interval_path,
-                                                interval_files,
-                                                stats_path,
-                                                patch_name,
-                                                logger,
-                                                x=4,
-                                                birth_limits=birth_limits,
-                                                confidence_band=False,
-                                                conf_c=conf,
-                                                single_dim=single_dim[patch_name])
-    stats = utils.combine_stats_files(stats_path,
-                                        run_path,
-                                        f"all_statistics_conf_{conf}.csv",
-                                        logger)
+    # combine all statistics files
+    stats = ut.combine_stats_files(
+        stats_path,
+        run_path,
+        "all_statistics.csv"
+        )
+    logger.info(f"Combined statistics files: {stats_path}all_statistics.csv")
+    # check single stats file exists
+    if exists(f"{stats_path}all_statistics.csv"):
         #  remove single stats files 
         stats_files = [file for file in listdir(stats_path)
                             if isfile(join(stats_path, file))]
         for name in stats_files:
             remove(stats_path+name)
         rmdir(stats_path)
+    else:
+        logger.warn("Failed to combine statistics files")
     
     logger.info("pipeline executed time(m): "
                 +str(round((time.time()-start_time)/60, 2)))
     return stats
 
 
-
 if __name__ == "__main__":
-    path = "C:/Users/yp4g14/Documents/PhDSToMI/PhDSToMI/data/TPF/"
+    path = "C:/Users/yp4g14/Documents/topological-bone-analysis/"
     stats = ph_pipeline_SEDT(path, logger, preprocess.otsu_threshold, patch_shape=300, stride=300, birth_limits=None, save_persistence_diagrams=False)
