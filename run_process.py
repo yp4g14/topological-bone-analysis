@@ -76,7 +76,8 @@ def topological_porosity_analysis(
              diagrams. Defaults to False.
 
     Returns:
-        [type]: [description]
+        pandas DataFrame: topological statistics per quadrant for .tiff image 
+            files in path
     """
     start_time = time.time()
     date = dt.datetime.now().strftime("%Y_%m_%d_Time_%H_%M")

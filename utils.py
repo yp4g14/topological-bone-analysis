@@ -95,7 +95,7 @@ def combine_stats_files(
     stats = []
     columns = set()
     for name in files:
-        df = pd.read_csv(path+name,index_col=0)
+        df = pd.read_csv(path+name)
         stats.append(df)
         columns = columns|set(df.columns)
     # order the columns the same in all files before join
@@ -107,7 +107,7 @@ def combine_stats_files(
         stats[i] = stats[i][list(columns)]
     stats = pd.concat(stats, ignore_index=True)
     try:
-    #     stats = stats.drop("Unnamed: 0", axis=1)
+        stats = stats.drop("Unnamed: 0", axis=1)
         stats = stats.drop('name.1', axis=1)
     except:
         pass
