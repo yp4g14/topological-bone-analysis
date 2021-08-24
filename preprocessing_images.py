@@ -4,7 +4,12 @@ from math import ceil, floor
 from skimage.util import view_as_windows
 from skimage.filters import threshold_otsu
 from itertools import product
-from os import listdir, rmdir, remove
+from os import listdir
+from os.path import isfile, join
+from PIL import Image
+import utils as ut
+from importlib import reload
+reload(ut)
 
 def trim(
     image,
@@ -114,6 +119,7 @@ def extract_patches(
     # take patches of padded image
     if stride is None:
         stride=patch_shape
+
     patches = view_as_windows(image,
                               patch_shape,
                               stride)
@@ -127,10 +133,6 @@ def extract_patches(
     row_coords = get_coords(stride, num_rows, patch_shape)
     patch_coords = list(product(row_coords, col_coords))
     
-    # check number of coordinates found is the same as number of patches taken
-    if patches.shape[0] != len(patch_coords):
-        print(f"{patches.shape[0]} patches found,\
-         {patch_coords} coordinates found")
     return image, patches, patch_coords
 
 def get_coords(
@@ -192,7 +194,8 @@ def SEDT(
 def image_to_patches(
     path,
     filename,
-    save_path,
+    padded_path,
+    patch_path,
     logger,
     patch_shape,
     stride,
@@ -216,7 +219,7 @@ def image_to_patches(
     else:
         filenames = [file]
     params.append(f"filenames: {filenames}")
-    image = ut.import_images(path, filenames)
+    image = ut.import_images(path, filenames)[0]
     
     # OPTIONAL TRIM FUNCTION 
     if trim_first ==True:
@@ -229,21 +232,25 @@ def image_to_patches(
         outfile.write("filename,image_shape_x,image_shape_y,patch_number,patch_width,patch_height,coord_array_row,coord_array_col\n")
     
     # extracts square patches size patch_size x patch_size stride distance apart
-    padded_image, patches, coords, im_shape = extract_patches(
+    padded_image, patches, coords = extract_patches(
         image,
         patch_shape,
-        stride,
-        pad_val)
+        pad_val=pad_val,
+        stride=stride)
     
-    Image.fromarray(padded_image).save(padded_ims_path+filename)
+    # check number of coordinates found is the same as number of patches taken
+    if patches.shape[0] != len(coords):
+        logger.warning(f"{patches.shape[0]} patches found\
+        but {len(coords)} coordinates found")
 
+    Image.fromarray(padded_image).save(padded_path+filename)
+    im_shape = padded_image.shape
     # test for a single patch if the percentage of pixels
     # under the background threshold is more than percentage_background permitted
     patch_index = 1
     patches_discarded = 0
     for j in range(patches.shape[0]):
         patch = patches[j]
-        coord = coords[j]
         # how much of the patch is background?
         patch_background_percentage = np.sum(patch <= background_val)/total_pixels
         # is the patch low enough background to save?
@@ -252,7 +259,7 @@ def image_to_patches(
             image_patch = Image.fromarray(patch)
             image_patch.save(f"{patch_path}{filename[:-4]}_{'{:03d}'.format(patch_index)}.tif")
             with open(f"{patch_path}patch_coords.csv", "a") as outfile:
-                outfile.write(f"{filename},{im_shape[0]},{im_shape[1]},{patch_index},{patch_width},{patch_height},{coords[j][0]},{coords[j][1]}\n")
+                outfile.write(f"{filename},{im_shape[0]},{im_shape[1]},{patch_index},{patch_shape},{patch_shape},{coords[j][0]},{coords[j][1]}\n")
             #increment index for save filename only if index has been used
             patch_index +=1
         else:

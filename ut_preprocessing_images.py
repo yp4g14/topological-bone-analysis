@@ -85,11 +85,10 @@ test_patches = np.array([
     test_padded_image[3:6,0:3:],
     test_padded_image[3:6,3:6],
     test_padded_image[3:6,6:9]])
-padded_image, patches, coords, shape = pre_process.extract_patches(
+padded_image, patches, coords = pre_process.extract_patches(
     test_input_im,
     patch_shape=3,
-    pad_val=0
-    )
+    pad_val=0)
 
 assert padded_image.shape == test_padded_image.shape,\
     "extract patches padded to incorrect shape"

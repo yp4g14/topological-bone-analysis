@@ -26,11 +26,8 @@ def peristent_homology_sublevel_cubic(
     #initialise paths
     idiagram_path=save_path+'idiagrams/'
     idiagram_filename = filename[:-4]+".idiagram"
-    pd_path = save_path+'persistence_intervals/'
+    interval_path = save_path+'persistence_intervals/'
     plot_path = save_path+'persistence_diagrams/'
-    for path in [idiagram_path, pd_path, plot_path]:
-        if not exists(path):
-            mkdir(path)
 
     # calculate sublevel set cubical homology persistence for each image
     hc.PDList.from_bitmap_levelset(
@@ -51,7 +48,7 @@ def peristent_homology_sublevel_cubic(
             intervals = np.vstack((intervals, [ess_birth[i],np.inf]))
         if intervals.shape[0] > 0:
             np.savetxt(
-                f"{pd_path}PD_dim_{dim}_{idiagram_filename[:-9]}.csv",
+                f"{interval_path}PD_dim_{dim}_{idiagram_filename[:-9]}.csv",
                 intervals,
                 delimiter=",")
 
