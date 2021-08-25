@@ -5,6 +5,9 @@ from importlib import reload
 import numpy as np
 import pandas as pd
 import datetime as dt
+from skimage.util import view_as_windows
+from PIL import Image 
+import itertools as it
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from math import ceil, floor
@@ -13,6 +16,13 @@ from matplotlib import rcParams
 import datetime as dt
 import utils as ut
 reload(ut)
+
+logger = logging.getLogger("patch")
+logger.setLevel(logging.DEBUG)
+console = logging.StreamHandler()
+stream_formatter = logging.Formatter('%(levelname)s - %(message)s')
+console.setFormatter(stream_formatter)
+logger.addHandler(console)
 
 def visualise_patch_scores(
     logger,
@@ -67,10 +77,10 @@ def visualise_patch_scores(
 
     """
     # create save directory if neccesary
-    ut.directory(save_path, logger)
+    ut.directory(save_path)
     
     # read in patch scores
-    scores = pd.read_csv(score_path)
+    scores = pd.read_csv(score_path, index_col=0)
 
     if score_column not in scores.columns:
         logger.error(f"Can't find score column {score_column}")

@@ -70,6 +70,7 @@ def quadrant_statistics(
         quadrant = intervals_quadrants[i]
         stats_dict = {}
         stats_dict["filename"] = filename
+        stats_dict["patch_number"] = filename[:-4]
         stats_dict["quadrant"] = i+1
         if quadrant.shape[0] > 0:
             # number of points
