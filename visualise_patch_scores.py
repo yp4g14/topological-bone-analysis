@@ -346,10 +346,10 @@ def plot_patch_scores(
         edgecolor='k')
     
     if normalise_scores == 'no':
-        save_name = f"{image_name[:-4]}_{score_column}_{colour}_min{min_score}_max{max_score}.svg"
+        save_name = f"{image_name[:-4]}_{score_column}_{colour}.svg"
     else:
         date = dt.datetime.now().strftime("%Y_%m_%d_Time_%H_%M")
-        save_name = f"{image_name[:-4]}_{score_column}_{colour}_{date}_{normalise_scores}_min{min_score}_max{max_score}.svg"
+        save_name = f"{image_name[:-4]}_{score_column}_{colour}_{date}_{normalise_scores}.svg"
 
     #  save visualisation of scores to save_path as svg
     plt.savefig(f"{save_path}{save_name}")
