@@ -6,6 +6,9 @@ from importlib import reload
 import numpy as np
 import pandas as pd
 import datetime as dt
+from skimage.util import view_as_windows
+from PIL import Image 
+import itertools as it
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from math import ceil, floor
