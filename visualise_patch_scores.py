@@ -23,11 +23,11 @@ console.setFormatter(stream_formatter)
 logger.addHandler(console)
 
 def visualise_patch_scores(
-    logger,
     image_path,
     patch_path,
     score_path,
     save_path,
+    logger,
     colour='bwr',
     normalise_scores='per_image',
     alpha=0.3,
@@ -364,14 +364,14 @@ if __name__ == "__main__":
     score_path = run_path+"all_statistics.csv"
     save_path =  run_path+"visualisations/"
     visualise_patch_scores(
-        logger,
         image_path,
         patch_path,
         score_path,
         save_path,
+        logger,
         colour='hot',
         normalise_scores='per_image',
-        positive_scores_only=False,
         alpha=0.4,
-        score_column='score'
+        score_column='0_avg_birth',
+        quadrant=2
         )
