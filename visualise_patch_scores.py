@@ -81,7 +81,7 @@ def visualise_patch_scores(
 
     # join scores and coords datasets on the filename and patch_number
     # drops filename/patch_name combinations that aren't in BOTH dataframes
-    scores = coords.merge(scores, on=['filename','patch_number'], how='inner')
+    scores = scores.merge(coords, on=['filename','patch_number'], how='left')
     
     # get the set of image names in the data
     image_names = list(set(scores['filename']))
@@ -102,7 +102,7 @@ def visualise_patch_scores(
     # visualise the patch scores for each image
     for name in image_names:
         image = ut.import_images(image_path, [name])[0]
-        create_visualisations_patch_scores(
+        plot_patch_scores(
             image,
             name,
             scores,
@@ -116,7 +116,7 @@ def visualise_patch_scores(
     logger.info(f"Completed all visualisations, see {save_path}")
 
 
-def create_visualisations_patch_scores(
+def plot_patch_scores(
     image,
     image_name,
     scores,
@@ -239,6 +239,7 @@ def create_visualisations_patch_scores(
     # normalise scores and set histogram limits
     if normalise_scores == 'no':
         norm_image_scores = image_scores
+        min_score = np.min(image_scores)
         max_score = np.max(image_scores)
         upper_map_limit = ceil(max_score)
         if positive_scores_only:
@@ -261,10 +262,11 @@ def create_visualisations_patch_scores(
         min_score = np.min(abs(image_scores))
         # normalise the image scores
         norm_image_scores = (image_scores-min_score)/(max_score-min_score)
-        upper_map_limit = 1
         if positive_scores_only:
+            upper_map_limit = 1
             lower_map_limit = 0
         else:
+            upper_map_limit = 0
             lower_map_limit = -1
 
     if normalise_scores == 'per_set':
@@ -342,16 +344,12 @@ def create_visualisations_patch_scores(
         width=bin_width,
         linewidth=1,
         edgecolor='k')
-    # plt.title(f"Histogram of average patch scores (per patch area)")
-    ytic = np.arange(0,int(max(counts)+1), step=2)
-    plt.yticks(list(ytic))
     
     if normalise_scores == 'no':
-        save_name = f"{image_name[:-4]}_{score_column}_{colour}.svg"
+        save_name = f"{image_name[:-4]}_{score_column}_{colour}_min{min_score}_max{max_score}.svg"
     else:
         date = dt.datetime.now().strftime("%Y_%m_%d_Time_%H_%M")
-        save_name = f"{image_name[:-4]}_{score_column}_{colour}_{date}_{normalise_scores}.svg"
-    plt.show()
+        save_name = f"{image_name[:-4]}_{score_column}_{colour}_{date}_{normalise_scores}_min{min_score}_max{max_score}.svg"
 
     #  save visualisation of scores to save_path as svg
     plt.savefig(f"{save_path}{save_name}")
@@ -361,7 +359,7 @@ def create_visualisations_patch_scores(
 if __name__ == "__main__":
 
     # create some test visualisations
-    run_path = "D:/topological-bone-analysis/example/2021_08_26_Time_11_17/"
+    run_path = "D:/topological-bone-analysis/example/2021_08_26_Time_13_38/"
     image_path = run_path+"padded/"
     patch_path = run_path+"patches/"
     score_path = run_path+"all_statistics.csv"
@@ -372,9 +370,9 @@ if __name__ == "__main__":
         score_path,
         save_path,
         logger,
-        colour='hot',
-        normalise_scores='per_image',
-        alpha=0.4,
+        colour='Blues_r',
+        normalise_scores='no',
+        alpha=0.3,
         score_column='0_avg_birth',
         quadrant=2
         )
