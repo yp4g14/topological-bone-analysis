@@ -143,6 +143,10 @@ def topological_porosity_analysis(
                         if isfile(join(binary_path, file))]
     binary_filenames = ut.check_ext(binary_filenames,['tif','tiff'],logger)
 
+    # initialise coordinate save file
+    with open(f"{patch_path}patch_coords.csv", "w") as outfile:
+        outfile.write("filename,image_shape_x,image_shape_y,patch_number,\
+            patch_width,patch_height,coord_array_row,coord_array_col\n")
     for filename in binary_filenames:
         preprocess.image_to_patches(
             binary_path,

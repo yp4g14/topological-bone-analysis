@@ -92,26 +92,33 @@ def combine_stats_files(
     """
     files = [file for file in listdir(path) if isfile(join(path, file))]
     files = check_ext(files, ['csv'], logger)
-    stats = []
-    columns = set()
-    for name in files:
-        df = pd.read_csv(path+name)
-        stats.append(df)
-        columns = columns|set(df.columns)
-    # order the columns the same in all files before join
-    for i in range(len(stats)):
-        cols_present = set(stats[i].columns)
-        cols_missing = columns - cols_present
-        for col in list(cols_missing):
-            stats[i][col] = None
-        stats[i] = stats[i][list(columns)]
-    stats = pd.concat(stats, ignore_index=True)
-    try:
-        stats = stats.drop("Unnamed: 0", axis=1)
-        stats = stats.drop('name.1', axis=1)
-    except:
-        pass
-    directory(save_path)
-    stats.to_csv(f"{save_path}{save_name}")
-    return stats
+    # split filenames
+    filenames_h0 = [name for name in files if int(name[7])==0]
+    filenames_h1 = [name for name in files if int(name[7])==1]
+    dropped = [name for name in files if name not in (filenames_h0+filenames_h1)]
+    if len(dropped)>0:
+        logger.warning(f"Files not used: {dropped}")
+    # combine all 0 dim intervals
+    stats_h0 = []
+    for name in filenames_h0:
+        df = pd.read_csv(path+name, index_col=0)
+        stats_h0.append(df)
+    stats_h0 = pd.concat(stats_h0, axis=0).reset_index(drop=True)
+    
+    # combine all 1 dim intervals
+    stats_h1 = []
+    for name in filenames_h1:
+        df = pd.read_csv(path+name, index_col=0)
+        stats_h1.append(df)
+    stats_h1 = pd.concat(stats_h1, axis=0).reset_index(drop=True)
 
+    # join together
+    common_cols = [col for col in stats_h0.columns if col in stats_h1.columns]\
+        +[col for col in stats_h1.columns if col in stats_h0.columns]
+    common_cols = list(set(common_cols))
+
+    stats_df = stats_h0.merge(stats_h1, on=common_cols, how='outer')
+
+    directory(save_path)
+    stats_df.to_csv(f"{save_path}{save_name}")
+    return stats_df

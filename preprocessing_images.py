@@ -200,7 +200,6 @@ def image_to_patches(
     patch_shape,
     stride,
     pad_val=0,
-    file=None,
     percentage_background=1,
     background_val=None,
     trim_first=True,
@@ -213,13 +212,7 @@ def image_to_patches(
               f"percentage background: {percentage_background}",
               f"background threshold: {background_val}"]
     # get files
-    if file == None:
-        filenames = [file for file in listdir(path) 
-                     if isfile(join(path, file))]
-    else:
-        filenames = [file]
-    params.append(f"filenames: {filenames}")
-    image = ut.import_images(path, filenames)[0]
+    image = ut.import_images(path, [filename])[0]
     
     # OPTIONAL TRIM FUNCTION 
     if trim_first ==True:
@@ -227,9 +220,6 @@ def image_to_patches(
 
     #total pixels per patch
     total_pixels = patch_shape**2
-    # take patches, test how much background is in the patch, save
-    with open(f"{patch_path}patch_coords.csv", "w") as outfile:
-        outfile.write("filename,image_shape_x,image_shape_y,patch_number,patch_width,patch_height,coord_array_row,coord_array_col\n")
     
     # extracts square patches size patch_size x patch_size stride distance apart
     padded_image, patches, coords = extract_patches(
@@ -264,13 +254,13 @@ def image_to_patches(
             patch_index +=1
         else:
             patches_discarded += 1
-    logger.info(f'''image: {filename} completed, 
-                {patch_index-1} patches saved,
-                {patches_discarded} patches discarded''')
-    params.append(f'''image: {filename} completed, 
-                {patch_index-1} patches saved,
-                {patches_discarded} patches discarded''')
+    logger.info(f"image: {filename} completed, \
+                {patch_index-1} patches saved, \
+                {patches_discarded} patches discarded")
+    params.append(f"image: {filename} completed, \
+                {patch_index-1} patches saved, \
+                {patches_discarded} patches discarded")
 
-    with open(patch_path+'params.txt', 'w') as filehandle:
+    with open(patch_path+"params.txt", "w") as filehandle:
         for param in params:
             filehandle.write('%s\n' % param)

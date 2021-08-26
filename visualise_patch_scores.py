@@ -361,7 +361,7 @@ def create_visualisations_patch_scores(
 if __name__ == "__main__":
 
     # create some test visualisations
-    run_path = "D:/topological-bone-analysis/example/2021_08_25_Time_13_48/"
+    run_path = "D:/topological-bone-analysis/example/2021_08_26_Time_11_17/"
     image_path = run_path+"padded/"
     patch_path = run_path+"patches/"
     score_path = run_path+"all_statistics.csv"
