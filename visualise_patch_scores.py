@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 from os.path import isfile, join
+from os import listdir
 from importlib import reload
 import numpy as np
 import pandas as pd
@@ -14,6 +15,13 @@ import datetime as dt
 import utils as ut
 reload(ut)
 
+logger = logging.getLogger("visualisation")
+logger.setLevel(logging.DEBUG)
+console = logging.StreamHandler()
+stream_formatter = logging.Formatter('%(levelname)s - %(message)s')
+console.setFormatter(stream_formatter)
+logger.addHandler(console)
+
 def visualise_patch_scores(
     logger,
     image_path,
@@ -23,89 +31,80 @@ def visualise_patch_scores(
     colour='bwr',
     normalise_scores='per_image',
     alpha=0.3,
-    score_column='score'
+    score_column='score',
+    quadrant=None
     ):
-    """
-    Wrapper function for create_visualisations_patch_scores.
+    """Visualises patch scores on a full image.
     Takes paths to the images/scores csvs and reads the data.
-    Creates the save directory.
-    Combines the scores and patch coordinates on filename and patch_number.
-    Checks can find the image files.
-    Calls create_visualisations_patch_scores in a loop per image,
+    Combines the scores and patch coordinates on filename and 
+    patch_number columns. Calls create_visualisations_patch_scores per image,
     which will save a visualisation of the patch scores on the full image
     in directory save_path.
-    
-    Parameters
-    ----------
-    logger : logging object
-    image_path : STRING
-        path to full images.
-    patch_path : STRING
-        path to patches, containing tif image patches 
-        and a csv 'patch_coords.csv' containing the patch locations.
-        This file is usually output by images_to_patches.
-    score_path : STRING
-        path to csv containing scores per patch.
-    save_path : STRING
-        output path.
-    colour : STRING
-        matplotlib colourscheme by string
-        'bwr' blue to white to red is default
-    normalise_scores : STRING (optional)
-        'per_image' normalises the scores per image
-        'per_set' normalises the scores per set contained in scores dataframe
-        'no' doesn't normalise the scores, plots the max score per image as the max colour
-        'no_set' doesn't normalise the scores, plots the max score per set as the max colour
-        default is 'per_image'
-    alpha : float (optional)
-        default is 0.3
-        adjusts alpha blending of scores into original image
 
-    Returns
-    -------
-    None.
-
+    Args:
+        logger (logger.logging object): logging
+        image_path (string): location of full images as string
+        patch_path (string): location of patches as string
+        score_path (string): location of 'scores' per patch as string
+        save_path (string): location to save visualisations as string
+        colour (str, optional): matplotlib colourscheme. 
+        Defaults to 'bwr' for blue white red.
+        normalise_scores (str, optional): normalise scores options
+            'per_image' normalises the scores per image
+            'per_set' normalises the scores per image set contained in scores
+            'no' doesn't normalise scores, colour max is max score per image
+            'no_set' doesn't normalise scores, colour max is max score per
+            image set. Defaults to 'per_image'.
+        alpha (float, optional): transparency of colour layer. Defaults to 0.3.
+        score_column (str): name of score column to visualise.
+        quadrant (int, optional): If not none, reduces scores to 
+            scores for quadrant column is quadrant. If None does not limit.
+            Defaults to None.
     """
     # create save directory if neccesary
-    ut.directory(save_path, logger)
+    ut.directory(save_path)
     
     # read in patch scores
-    scores = pd.read_csv(score_path)
+    scores = pd.read_csv(score_path, index_col=0)
 
     if score_column not in scores.columns:
-        logger.error(f"Can't find score column {score_column}")
-    
+        logger.error(f"Couldn't find {score_column} column in scores")
+
+    if quadrant is not None:
+        scores = scores.loc[scores['quadrant'] == quadrant]
+
     # read in patch coords usually output by images_to_patches
     coords = pd.read_csv(patch_path+'/patch_coords.csv')
 
     # join scores and coords datasets on the filename and patch_number
-    # inner join will drop filename/patch_name combos that don't exist in BOTH dataframes
+    # drops filename/patch_name combinations that aren't in BOTH dataframes
     scores = coords.merge(scores, on=['filename','patch_number'], how='inner')
     
     # get the set of image names in the data
     image_names = list(set(scores['filename']))
-    logger.info(f"Image names with scores: {image_names}")
 
     # check can find all image files in image_path,
     # warn and remove from list if not found
-    im_filenames = [file for file in os.listdir(image_path) 
+    im_filenames = [file for file in listdir(image_path) 
                     if isfile(join(image_path, file))]
     
-    im_filenames = ut.check_ext(im_filenames, logger, ['tif', 'tiff'])
+    im_filenames = ut.check_ext(im_filenames, ['tif', 'tiff'], logger)
     
     for name in image_names:
         if name not in im_filenames:
             logger.warning(f"Can't find {name} in {image_path}")
             image_names.remove(name)
+    logger.info(f"Total {len(image_names)} images")
         
     # visualise the patch scores for each image
     for name in image_names:
+        image = ut.import_images(image_path, [name])[0]
         create_visualisations_patch_scores(
-            logger,
-            image_path,
+            image,
             name,
             scores,
             save_path,
+            logger,
             colour,
             normalise_scores,
             alpha,
@@ -113,65 +112,51 @@ def visualise_patch_scores(
             )
     logger.info(f"Completed all visualisations, see {save_path}")
 
+
 def create_visualisations_patch_scores(
-    logger,
-    image_path,
+    image,
     image_name,
     scores,
     save_path,
+    logger,
     colour='bwr',
     normalise_scores='per_image',
     alpha=0.3,
     score_column='score'
     ):
-    """
-    Called inside visualise_path_scores function.
-    Creates a visualisation of an original image, 
-    overlayed with scores per patch shown in chosen colourscheme,
-    and a histogram of those scores.
-
+    """Creates a single visualisation of patch scores on an image.
     The full image scores are created by averaging the scores
     for overlapping patches and alpha blending ontop of original image.
 
-    Parameters
-    ----------
-    logger : logging object
-    image_path : STRING
-        path to folder containing full image.
-    image_name : STRING
-        filename for image including extension
-    scores : pandas DataFrame
-        containing scores per patch.
-    save_path : STRING
-        output path
-    colour : STRING (optional)
-        matplotlib colourscheme reference as string, defaults to blue white red
-    normalise_scores : STRING (optional)
-        'per_image' normalises the scores per image
-        'per_set' normalises the scores per set contained in scores dataframe
-        'no' doesn't normalise the scores, plots the max score per image as the max colour
-        'no_set' doesn't normalise the scores, plots the max score per set as the max colour
-        default is 'per_image'
-    alpha : float (optional)
-        adjusts alpha blending
-        default is 0.3
-
-    Returns
-    -------
-    None.
-
+    Args:
+        image (numpy array): full image as array
+        image_name (string): image filename
+        scores (pandas DataFrame): scores to overlay as colour layer
+        save_path (string): location to save the visualisation as string
+        logger (logging.logger object): logging
+        colour (str, optional): colourscheme to plot scores. Defaults to 'bwr'.
+        normalise_scores (str, optional): normalise scores options
+            'per_image' normalises the scores per image
+            'per_set' normalises the scores per image set contained in scores
+            'no' doesn't normalise scores, colour max is max score per image
+            'no_set' doesn't normalise scores, colour max is max score per
+            image set. Defaults to 'per_image'.
+        alpha (float, optional): transparency of colour layer. Defaults to 0.3.
+        score_column (str): name of score column to visualise.
     """
-    
-    logger.info(f"starting {image_name}")
-    if any(scores[score_column] < 0 ):
+    # check settings
+    norm_score_settings = ['per_image', 'per_set', 'no', 'no_set']
+    if normalise_scores not in norm_score_settings:
+        logger.error(f"normalise_scores set incorrectly,\
+         please choose one of {norm_score_settings}")
+    if (alpha <= 0) or (alpha>=1):
+        logger.error(f"alpha {alpha} not between (0,1)")
+
+    if any(scores[score_column] < 0):
         positive_scores_only=False
     else:
         positive_scores_only=True
 
-    norm_score_settings = ['per_image', 'per_set', 'no', 'no_set']
-    if normalise_scores not in norm_score_settings:
-        logger.error(f"normalise_scores set incorrectly, please choose one of {norm_score_settings}")
-    
     #  if normalise_score is 'per_set'
     # to normalise the scores accross the whole image set
     # we need absolute min and max score
@@ -288,16 +273,11 @@ def create_visualisations_patch_scores(
             lower_map_limit = 0
         else:
             lower_map_limit = -1
-
-    logger.info("Combined patch scores")
-
-    # get full image
-    image = ut.get_grey_images(image_path, [image_name], logger)[0]
-    logger.info("Retrieved full image")
     
     # test image read in matches shape of scores array
     if image.shape != norm_image_scores.shape:
-        logger.warn("shape error, check using padded image")
+        logger.error(f"shape error, image given has shape {image.shape}\
+            the patch scores have final shape {norm_image_scores.shape}")
 
     # plot the normalised scores on top of the image
     # with the histogram of scores acting as a colourbar
@@ -343,7 +323,6 @@ def create_visualisations_patch_scores(
         vmin=lower_map_limit,
         vmax=upper_map_limit)
     ax0.set_axis_off()
-#    plt.title(f"Patch scores {score_column} for {image_name[:-4]}")
 
     # add histogram
     ax1 = fig.add_subplot(spec[1])
@@ -369,6 +348,7 @@ def create_visualisations_patch_scores(
     else:
         date = dt.datetime.now().strftime("%Y_%m_%d_Time_%H_%M")
         save_name = f"{image_name[:-4]}_{score_column}_{colour}_{date}_{normalise_scores}.svg"
+    plt.show()
 
     #  save visualisation of scores to save_path as svg
     plt.savefig(f"{save_path}{save_name}")
@@ -378,10 +358,11 @@ def create_visualisations_patch_scores(
 if __name__ == "__main__":
 
     # create some test visualisations
-    image_path = "C:/Users/yp4g14/Documents/PhDSToMI/PhDSToMI/data/testset/2020_10_28_Time_17_55/binary/padded/"
-    patch_path = "C:/Users/yp4g14/Documents/PhDSToMI/PhDSToMI/data/testset/2020_10_28_Time_17_55/binary/patches/"
-    score_path = "C:/Users/yp4g14/Documents/PhDSToMI/PhDSToMI/data/testset/2020_10_28_Time_17_55/binary/patches/fake_scores.csv"
-    save_path =  "C:/Users/yp4g14/Documents/PhDSToMI/PhDSToMI/data/testset/visualise/blues/per_image/"
+    run_path = "D:/topological-bone-analysis/example/2021_08_25_Time_13_48/"
+    image_path = run_path+"padded/"
+    patch_path = run_path+"patches/"
+    score_path = run_path+"all_statistics.csv"
+    save_path =  run_path+"visualisations/"
     visualise_patch_scores(
         logger,
         image_path,

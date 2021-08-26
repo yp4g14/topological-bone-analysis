@@ -243,7 +243,7 @@ def topological_porosity_analysis(
 
 
 if __name__ == "__main__":
-    path = "C:/Users/yp4g14/Documents/topological-bone-analysis/"
+    path = "D:/topological-bone-analysis/example/"
     stats = topological_porosity_analysis(
         path,
         logger,
