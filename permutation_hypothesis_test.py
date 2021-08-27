@@ -100,10 +100,27 @@ def multiple_comparison_correction(
     p_vals_path,
     stats_list,
     logger,
-    category_pair=('group_a','group_b'),
+    category_pair,
     alpha=0.05
     ):
-    
+    """This function corrects for the multiple comparison problem between two 
+    categories (specified by category_pair) by using a Benjamini-Hochberg 
+    p-value adjustment at an overall significance (specified by alpha).
+
+    Args:
+        p_vals_path (string): location of p values csv as string
+        stats_list ([type]): lsit of statistics to adjust over
+        logger (logger.Logging object): logging
+        category_pair (tuple): tuple of category names for which to make the 
+            adjustments e.g. ('group_a','group_b') takes all tests between 
+            these two groups and adjusts for the stats in stat_list
+        alpha (float, optional): Level for p-value adjustment. 
+            Defaults to 0.05.
+
+    Returns:
+        pandas DataFrame: dataframe with original and adjusted p vals,
+         sorted by increasing adjusted p value.
+    """
     # read p_values
     p_values_df = pd.read_csv(p_vals_path, index_col=0)
     
@@ -183,6 +200,37 @@ def group_comparison_permutation_test(
     adjust_p_vals=True,
     alpha=0.05
     ):
+    """Runs permutation tests between different groups of patches for the 
+    statistics in stat_df. The groups are specified using name_maps, which 
+    should be a dictionary with string filenames as keys with strings of 
+    their categories as values. Will save a .csv of the p values in save_path.
+
+    Args:
+        name_maps (dict): keys are filenames as strings, values are categories 
+            as strings
+        stat_df (pandas DataFrame): dataframe with filenames, patch numbers,
+            quadrant columns and their corresponding quadrant statistics 
+            each as a column.
+        save_path (string): location to save p_values.csv as string
+        logger (logging.Loggger object): logging
+        stats_list_to_test (list, optional): list of statistic names as strings
+            to test, if not specified will test all extraneous columns.
+             Defaults to None.
+        metric_func (function, optional): measure to use for difference between
+             groups, usually the mean or median. Defaults to np.average.
+        plot_significant (bool, optional): Will plot the shuffled distributions
+            where significant if True, otherwise no plots are generated.
+             Defaults to False.
+        adjust_p_vals (bool, optional): Whether to apply the Benjamini-Hochberg
+            p value adjustment, if True you must specify stats_list_to_test,
+            and it will adjust for all of these statistics only.
+            Defaults to True.
+        alpha (float, optional): overall significance level for p_value
+            adjustment. Defaults to 0.05.
+
+    Returns:
+        pandas DataFrame: p values (and adjusted if adjustment made)
+    """
     ut.directory(save_path)
     if plot_significant:
         ut.directory(save_path+"permutation_hypothesis_tests/")
