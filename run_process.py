@@ -15,6 +15,8 @@ import utils as ut
 import preprocessing_images as preprocess
 import persistent_homology_SEDT as ph
 import persistence_statistics_per_quadrant as stats
+import svm
+reload(svm)
 reload(ut)
 reload(preprocess)
 reload(ph)
@@ -38,7 +40,14 @@ def topological_porosity_analysis(
     trim=True,
     single_file=None,
     split_radius=-2,
-    save_persistence_diagrams=False
+    save_persistence_diagrams=False,
+    classification=False,
+    feature_cols=None
+    filenames_map=None,
+    runs=100,
+    strat_col=None,
+    cross_val='stratkfold',
+    param_grid_SVC = {'C': [1,2,3], 'kernel': ('rbf','linear')}
     ):
     """Takes a set of grayscale images, or a single file,
     thresholds to binary with threshold_func
@@ -241,13 +250,57 @@ def topological_porosity_analysis(
     else:
         logger.warn("Failed to combine statistics files")
     
+    if classification:
+        results = svm.classification_one_v_one(
+            stats_df,
+            run_path,
+            logger,
+            feature_cols,
+            filenames_map,
+            runs=runs,
+            strat_col=None,
+            cross_val='stratkfold',
+            param_grid_SVC = {'C': [1,2,3], 'kernel': ('rbf','linear')}
+        )
+        return stats_df, results
+
     logger.info("pipeline executed time(m): "
                 +str(round((time.time()-start_time)/60, 2)))
     return stats_df
 
-
 if __name__ == "__main__":
     path = "D:/topological-bone-analysis/example/"
+    feature_cols = [
+        '0_num_points',
+        '0_avg_birth',
+        '0_stddev_birth',
+        '0_skew_birth',
+        '0_percentile_25_birth',
+        '0_percentile_75_birth',
+        '0_iqr_birth',
+        '0_avg_death',
+        '0_stddev_death',
+        '0_skew_death',
+        '0_percentile_25_death',
+        '0_percentile_75_death',
+        '0_iqr_death',
+        '0_pers_entropy',
+        '1_num_points',
+        '1_avg_birth',
+        '1_stddev_birth',
+        '1_skew_birth',
+        '1_percentile_25_birth',
+        '1_percentile_75_birth',
+        '1_iqr_birth',
+        '1_avg_death',
+        '1_stddev_death',
+        '1_skew_death',
+        '1_percentile_25_death',
+        '1_percentile_75_death',
+        '1_iqr_death',
+        '1_pers_entropy']
+    filenames_map = {'example_SHG_1.tif':'group_a', 'example_SHG_2.tif':'group_b'}
+
     stats = topological_porosity_analysis(
         path,
         logger,
