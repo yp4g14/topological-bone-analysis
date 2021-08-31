@@ -55,28 +55,20 @@ def otsu_threshold(
     binary_image = (image > threshold_val).astype(int)
     return binary_image
 
+def minimum(image):
+    """Takes a grayscale image and binarizes using minimum method from the
+    skimage.filters
 
-# def custom_threshold(
-#     image,
-#     threshold=10):
-#     """Calculates the custom threshold and applies to a grayscale image.
+    Args:
+        image (numpy array): grayscale image (numpy array)
 
-#     Args:
-#         image (array): [description]
-#         threshold (int, optional): [description]. Defaults to 10.
-#     """
-#     binary_im = (image > threshold).astype(int)
-#     return binary_im
-
-# from skimage.filters import threshold_minimum
-# def minimum(
-#     image,
-#     binary_path,
-#     filename,
-#     logger):
-#     val = threshold_minimum(image)
-#     binary_im = (image > val).astype(int)
-#     return binary_im
+    Returns:
+        binary_image (numpy array): binary ([0,1]) image (numpy array)
+    """
+    from skimage.filters import threshold_minimum
+    val = threshold_minimum(image)
+    binary_im = (image > val).astype(int)
+    return binary_im
 
 def extract_patches(
     image,
