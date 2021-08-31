@@ -186,8 +186,6 @@ def SEDT(
 def image_to_patches(
     path,
     filename,
-    padded_path,
-    patch_path,
     logger,
     patch_shape,
     stride,
@@ -196,6 +194,9 @@ def image_to_patches(
     background_val=None,
     trim_first=True,
     edge_val=0):
+    binary_path = path+'binary/'
+    padded_path = path+'padded/'
+    patch_path = path+'patches/'
 
     #make parameter list to save in run output location
     params = [f"path: {path}",
@@ -204,7 +205,7 @@ def image_to_patches(
               f"percentage background: {percentage_background}",
               f"background threshold: {background_val}"]
     # get files
-    image = ut.import_images(path, [filename])[0]
+    image = ut.import_images(binary_path, [filename])[0]
     
     # OPTIONAL TRIM FUNCTION 
     if trim_first ==True:
@@ -240,7 +241,7 @@ def image_to_patches(
             #save patch as image
             image_patch = Image.fromarray(patch)
             image_patch.save(f"{patch_path}{filename[:-4]}_{'{:03d}'.format(patch_index)}.tif")
-            with open(f"{patch_path}patch_coords.csv", "a") as outfile:
+            with open(f"{path}patch_coords.csv", "a") as outfile:
                 outfile.write(f"{filename},{im_shape[0]},{im_shape[1]},{patch_index},{patch_shape},{patch_shape},{coords[j][0]},{coords[j][1]}\n")
             #increment index for save filename only if index has been used
             patch_index +=1
@@ -253,6 +254,6 @@ def image_to_patches(
                 {patch_index-1} patches saved, \
                 {patches_discarded} patches discarded")
 
-    with open(patch_path+"params.txt", "w") as filehandle:
+    with open(path+"patch_params.txt", "a") as filehandle:
         for param in params:
             filehandle.write('%s\n' % param)

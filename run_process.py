@@ -15,7 +15,7 @@ import utils as ut
 import preprocessing_images as preprocess
 import persistent_homology_SEDT as ph
 import persistence_statistics_per_quadrant as stats
-import svm
+import SVM as svm
 reload(svm)
 reload(ut)
 reload(preprocess)
@@ -42,7 +42,7 @@ def topological_porosity_analysis(
     split_radius=-2,
     save_persistence_diagrams=False,
     classification=False,
-    feature_cols=None
+    feature_cols=None,
     filenames_map=None,
     runs=100,
     strat_col=None,
@@ -153,15 +153,13 @@ def topological_porosity_analysis(
     binary_filenames = ut.check_ext(binary_filenames,['tif','tiff'],logger)
 
     # initialise coordinate save file
-    with open(f"{patch_path}patch_coords.csv", "w") as outfile:
+    with open(f"{run_path}patch_coords.csv", "w") as outfile:
         outfile.write("filename,image_shape_x,image_shape_y,patch_number,"\
             +"patch_width,patch_height,coord_array_row,coord_array_col\n")
     for filename in binary_filenames:
         preprocess.image_to_patches(
-            binary_path,
+            run_path,
             filename,
-            padded_path,
-            patch_path,
             logger,
             patch_shape,
             stride=stride,
@@ -251,18 +249,19 @@ def topological_porosity_analysis(
         logger.warn("Failed to combine statistics files")
     
     if classification:
-        results = svm.classification_one_v_one(
+        logger.info("Classification beginning")
+        svm_results = svm.classification_one_v_one(
             stats_df,
             run_path,
             logger,
             feature_cols,
             filenames_map,
             runs=runs,
-            strat_col=None,
-            cross_val='stratkfold',
-            param_grid_SVC = {'C': [1,2,3], 'kernel': ('rbf','linear')}
+            strat_col=strat_col,
+            cross_val=cross_val,
+            param_grid_SVC = param_grid_SVC
         )
-        return stats_df, results
+        return stats_df, svm_results
 
     logger.info("pipeline executed time(m): "
                 +str(round((time.time()-start_time)/60, 2)))
@@ -301,10 +300,18 @@ if __name__ == "__main__":
         '1_pers_entropy']
     filenames_map = {'example_SHG_1.tif':'group_a', 'example_SHG_2.tif':'group_b'}
 
-    stats = topological_porosity_analysis(
+    stats, results = topological_porosity_analysis(
         path,
         logger,
         preprocess.otsu_threshold,
         patch_shape=100,
         stride=100,
-        save_persistence_diagrams=False)
+        save_persistence_diagrams=False,
+        classification=True,
+        feature_cols=feature_cols,
+        filenames_map=filenames_map,
+        runs=10,
+        strat_col=None,
+        cross_val='stratkfold',
+        param_grid_SVC = {'C': [1,2,3], 'kernel': ('rbf','linear')}
+    )
