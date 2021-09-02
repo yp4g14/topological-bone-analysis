@@ -55,7 +55,7 @@ def otsu_threshold(
     binary_image = (image > threshold_val).astype(int)
     return binary_image
 
-def minimum(image):
+def minimum_threshold(image):
     """Takes a grayscale image and binarizes using minimum method from the
     skimage.filters
 
