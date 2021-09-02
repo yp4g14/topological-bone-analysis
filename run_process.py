@@ -15,12 +15,14 @@ import utils as ut
 import preprocessing_images as preprocess
 import persistent_homology_SEDT as ph
 import persistence_statistics_per_quadrant as stats
+import plots
 import SVM as svm
-reload(svm)
 reload(ut)
 reload(preprocess)
 reload(ph)
 reload(stats)
+reload(plots)
+reload(svm)
 
 # setup logging
 logger = logging.getLogger("run_porosity_analysis")
@@ -41,6 +43,7 @@ def topological_porosity_analysis(
     single_file=None,
     split_radius=-2,
     save_persistence_diagrams=False,
+    analysis_plots=False,
     classification=False,
     feature_cols=None,
     filenames_map=None,
@@ -103,7 +106,8 @@ def topological_porosity_analysis(
     if save_persistence_diagrams:
         pd_path = f"{run_path}persistence_diagrams/"
     stats_path = f"{run_path}statistics/"
-
+    if analysis_plots:
+        plot_path = f"{run_path}plots/"
     # check or create all paths
     ut.directory(run_path)
     if threshold_func:
@@ -116,6 +120,8 @@ def topological_porosity_analysis(
     if save_persistence_diagrams:
         ut.directory(pd_path)
     ut.directory(stats_path)
+    if analysis_plots:
+        ut.directory(plot_path)
     logger.info("directories created")
 
     logger.info(f"path to images: {path}")
@@ -248,6 +254,14 @@ def topological_porosity_analysis(
     else:
         logger.warn("Failed to combine statistics files")
     
+    if analysis_plots:
+        plots.analysis_plots(
+            stats_df,
+            filenames_map,
+            plot_path,
+            feature_cols)
+        logger.info(f"Plots saved to {plot_path}")
+
     if classification:
         logger.info("Classification beginning")
         svm_results = svm.classification_one_v_one(
@@ -261,6 +275,7 @@ def topological_porosity_analysis(
             cross_val=cross_val,
             param_grid_SVC = param_grid_SVC
         )
+        
         return stats_df, svm_results
 
     logger.info("pipeline executed time(m): "
