@@ -1,7 +1,0 @@
-os
-numpy
-pandas
-PIL
-sklearn
-maptplotlib
-maths

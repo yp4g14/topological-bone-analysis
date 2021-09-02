@@ -32,6 +32,7 @@ stream_formatter = logging.Formatter('%(levelname)s - %(message)s')
 console.setFormatter(stream_formatter)
 logger.addHandler(console)
 
+
 def topological_porosity_analysis(
     path,
     logger,
