@@ -1,5 +1,5 @@
-Persistent Homology SEDT module
-===============================
+Persistent Homology SEDT
+========================
 
 .. automodule:: src.persistent_homology_SEDT
    :members:

@@ -1,5 +1,5 @@
-Visualise patch scores module
-=============================
+Visualise patch scores
+======================
 
 .. automodule:: src.visualise_patch_scores
    :members:

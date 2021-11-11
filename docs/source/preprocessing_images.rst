@@ -1,5 +1,5 @@
-Preprocessing images module
-===========================
+Preprocessing images
+====================
 
 .. automodule:: src.preprocessing_images
    :members:

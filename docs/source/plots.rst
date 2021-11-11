@@ -1,5 +1,5 @@
-Boxplots module
-===============
+Analysis plots
+==============
 
 .. automodule:: src.plots
    :members:

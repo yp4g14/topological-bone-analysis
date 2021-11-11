@@ -1,5 +1,5 @@
-Persistence Statistics per Quadrant module
-==========================================
+Persistence Statistics per Quadrant
+===================================
 
 .. automodule:: src.persistence_statistics_per_quadrant
    :members:

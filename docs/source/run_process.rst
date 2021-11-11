@@ -1,5 +1,5 @@
-Run process module
-==================
+Run process
+===========
 
 .. automodule:: src.run_process
    :members:

@@ -1,5 +1,5 @@
-SVM module
-==========
+Support Vector Machine
+======================
 
 .. automodule:: src.SVM
    :members:
