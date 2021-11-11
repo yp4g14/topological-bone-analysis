@@ -1,0 +1,255 @@
+
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Run process &#8212; topological-bone-analysis  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/cloud.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noticia+Text:400,i,b,bi|Open+Sans:400,i,b,bi|Roboto+Mono:400,i,b,bi&amp;display=swap" type="text/css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+
+    
+    
+     
+        <script src="_static/jquery.cookie.js"></script>
+    
+
+    
+     
+        <script src="_static/cloud.base.js"></script>
+    
+
+    
+     
+        <script src="_static/cloud.js"></script>
+    
+
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Support Vector Machine" href="SVM.html" />
+    <link rel="prev" title="Analysis plots" href="plots.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head><body>
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="SVM.html" title="Support Vector Machine"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="plots.html" title="Analysis plots"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">Modules</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Run process</a></li> 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS overrides for cloud theme */
+
+/* nicer titles and more space for info and warning logos */
+
+div.admonition p.admonition-title {
+    background: rgba(0, 0, 0, .05);
+    margin: .5em -1em;
+    margin-top: -.5em !important;
+    padding: .5em .5em .5em 2.65em;
+}
+
+/* indent single paragraph */
+div.admonition {
+    text-indent: 20px;
+}
+/* don't indent multiple paragraphs */
+div.admonition > p {
+    text-indent: 0;
+}
+/* remove excessive padding */
+div.admonition.inline-title p.admonition-title {
+    padding-left: .2em;
+}
+</style>
+<section id="module-src.run_process">
+<span id="run-process"></span><h1>Run process<a class="headerlink" href="#module-src.run_process" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.run_process.topological_porosity_analysis">
+<span class="sig-prename descclassname"><span class="pre">src.run_process.</span></span><span class="sig-name descname"><span class="pre">topological_porosity_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_persistence_diagrams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classification</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filenames_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strat_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stratkfold'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_grid_SVC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'C':</span> <span class="pre">[1,</span> <span class="pre">2,</span> <span class="pre">3],</span> <span class="pre">'kernel':</span> <span class="pre">('rbf',</span> <span class="pre">'linear')}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/run_process.html#topological_porosity_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.run_process.topological_porosity_analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a set of grayscale images, or a single file,
+thresholds to binary with threshold_func
+optionally trims the binary images of background_val
+pads them into exact multiples of patch_shape
+and then cuts them into square patches stride apart.
+Each binary patch is transformed with a Signed Euclidean Distance transform
+before the persistent homology is calculated using cubical complexes
+with the filtration built over sublevel sets of the SEDT transformed patch.
+The persistence birth, death intervals are saved out for 0 and 1 homology,
+and the persistence diagrams are made and optionally plotted.
+Summary statistics of these intervals are calculated per quadrant.
+split radius calculates the number of points in quadrant 2 of H_0
+in [-inf, split_radius] and (split_radius, 0].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>string</em>) – location as a string of grayscale images as .tiff files</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger object</em>) – logs the process</p></li>
+<li><p><strong>threshold_func</strong> (<em>function</em>) – takes in a numpy array of a grayscale image
+and returns a binary image</p></li>
+<li><p><strong>patch_shape</strong> (<em>int</em><em>, </em><em>optional</em>) – pixel length and width of patches to take.
+Defaults to 300.</p></li>
+<li><p><strong>background_val</strong> (<em>int</em><em>, </em><em>optional</em>) – value [0,1] of image that is background
+after binary. Defaults to 0.</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – number of pixels to move accross/down image
+before taking next patch. Defaults to None.</p></li>
+<li><p><strong>trim</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to trim empty rows and columns before
+padding to take patches. Defaults to True.</p></li>
+<li><p><strong>single_file</strong> (<em>string</em><em>, </em><em>optional</em>) – filename if single file not all images
+in path location. Defaults to None.</p></li>
+<li><p><strong>split_radius</strong> (<em>int</em><em>, </em><em>optional</em>) – split radius calculates the number of
+points in quadrant 2 of H_0 in [-inf, split_radius] and
+(split_radius, 0]. Defaults to -2.</p></li>
+<li><p><strong>save_persistence_diagrams</strong> (<em>bool</em><em>, </em><em>optional</em>) – saves plots of persistence
+diagrams. Defaults to False.</p></li>
+<li><p><strong>analysis_plots</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True saves box plots comparing groups
+defined by filenames map. Defaults to False</p></li>
+<li><p><strong>classification</strong> (<em>bool</em><em>, </em><em>optional</em>) – into groups (filenames_map) using the specified feature_cols,
+with runs, strat_col, cross_val and param_grid_SVC specifying
+parameters. Defaults to False.</p></li>
+<li><p><strong>feature_cols</strong> (<em>list</em><em>, </em><em>optional</em>) – If list of string statistic names, will use specified.</p></li>
+<li><p><strong>filenames_map</strong> (<em>dict</em><em>, </em><em>optional</em>) – (string) as keys, and a group name as values.</p></li>
+<li><p><strong>runs</strong> (<em>optional</em><em>, </em><em>int</em>) – </p></li>
+<li><p><strong>strat_col</strong> (<em>optional</em><em>, </em><em>string</em>) – </p></li>
+<li><p><strong>cross_val</strong> (<em>optional</em><em>, </em><em>string</em>) – </p></li>
+<li><p><strong>to</strong> (<em>param_grid_SVC</em><em> (</em><em>parameter grid to train SVC. Defaults</em>) – {‘C’: [1,2,3], ‘kernel’: (‘rbf’,’linear’)}</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>topological statistics per quadrant for .tiff image</dt><dd><p>files in path</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="plots.html"
+                          title="Previous page">&larr; Analysis plots</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="SVM.html"
+                          title="Next page">&rarr; Support Vector Machine</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/run_process.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="SVM.html" title="Support Vector Machine"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="plots.html" title="Analysis plots"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="modules.html" >Modules</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Run process</a></li> 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Ysanne Pritchard.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+</html>

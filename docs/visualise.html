@@ -1,0 +1,242 @@
+
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Visualise patch scores &#8212; topological-bone-analysis  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/cloud.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noticia+Text:400,i,b,bi|Open+Sans:400,i,b,bi|Roboto+Mono:400,i,b,bi&amp;display=swap" type="text/css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+
+    
+    
+     
+        <script src="_static/jquery.cookie.js"></script>
+    
+
+    
+     
+        <script src="_static/cloud.base.js"></script>
+    
+
+    
+     
+        <script src="_static/cloud.js"></script>
+    
+
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="utils" href="utils.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head><body>
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="utils.html" title="utils"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">Modules</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Visualise patch scores</a></li> 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS overrides for cloud theme */
+
+/* nicer titles and more space for info and warning logos */
+
+div.admonition p.admonition-title {
+    background: rgba(0, 0, 0, .05);
+    margin: .5em -1em;
+    margin-top: -.5em !important;
+    padding: .5em .5em .5em 2.65em;
+}
+
+/* indent single paragraph */
+div.admonition {
+    text-indent: 20px;
+}
+/* don't indent multiple paragraphs */
+div.admonition > p {
+    text-indent: 0;
+}
+/* remove excessive padding */
+div.admonition.inline-title p.admonition-title {
+    padding-left: .2em;
+}
+</style>
+<section id="module-src.visualise_patch_scores">
+<span id="visualise-patch-scores"></span><h1>Visualise patch scores<a class="headerlink" href="#module-src.visualise_patch_scores" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.visualise_patch_scores.plot_patch_scores">
+<span class="sig-prename descclassname"><span class="pre">src.visualise_patch_scores.</span></span><span class="sig-name descname"><span class="pre">plot_patch_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bwr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalise_scores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'per_image'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'score'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/visualise_patch_scores.html#plot_patch_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.visualise_patch_scores.plot_patch_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a single visualisation of patch scores on an image.
+The full image scores are created by averaging the scores
+for overlapping patches and alpha blending ontop of original image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>numpy array</em>) – full image as array</p></li>
+<li><p><strong>image_name</strong> (<em>string</em>) – image filename</p></li>
+<li><p><strong>scores</strong> (<em>pandas DataFrame</em>) – scores to overlay as colour layer</p></li>
+<li><p><strong>save_path</strong> (<em>string</em>) – location to save the visualisation as string</p></li>
+<li><p><strong>logger</strong> (<em>logging.logger object</em>) – logging</p></li>
+<li><p><strong>colour</strong> (<em>str</em><em>, </em><em>optional</em>) – colourscheme to plot scores. Defaults to ‘bwr’.</p></li>
+<li><p><strong>normalise_scores</strong> (<em>str</em><em>, </em><em>optional</em>) – normalise scores options
+‘per_image’ normalises the scores per image
+‘per_set’ normalises the scores per image set contained in scores
+‘no’ doesn’t normalise scores, colour max is max score per image
+‘no_set’ doesn’t normalise scores, colour max is max score per
+image set. Defaults to ‘per_image’.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – transparency of colour layer. Defaults to 0.3.</p></li>
+<li><p><strong>score_column</strong> (<em>str</em>) – name of score column to visualise.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.visualise_patch_scores.visualise_patch_scores">
+<span class="sig-prename descclassname"><span class="pre">src.visualise_patch_scores.</span></span><span class="sig-name descname"><span class="pre">visualise_patch_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bwr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalise_scores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'per_image'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'score'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quadrant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/visualise_patch_scores.html#visualise_patch_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.visualise_patch_scores.visualise_patch_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualises patch scores on a full image.
+Takes paths to the images/scores csvs and reads the data.
+Combines the scores and patch coordinates on filename and
+patch_number columns. Calls create_visualisations_patch_scores per image,
+which will save a visualisation of the patch scores on the full image
+in directory save_path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logger.logging object</em>) – logging</p></li>
+<li><p><strong>image_path</strong> (<em>string</em>) – location of full images as string</p></li>
+<li><p><strong>patch_path</strong> (<em>string</em>) – location of patches as string</p></li>
+<li><p><strong>score_path</strong> (<em>string</em>) – location of ‘scores’ per patch as string</p></li>
+<li><p><strong>save_path</strong> (<em>string</em>) – location to save visualisations as string</p></li>
+<li><p><strong>colour</strong> (<em>str</em><em>, </em><em>optional</em>) – matplotlib colourscheme.</p></li>
+<li><p><strong>red.</strong> (<em>Defaults to 'bwr' for blue white</em>) – </p></li>
+<li><p><strong>normalise_scores</strong> (<em>str</em><em>, </em><em>optional</em>) – normalise scores options
+‘per_image’ normalises the scores per image
+‘per_set’ normalises the scores per image set contained in scores
+‘no’ doesn’t normalise scores, colour max is max score per image
+‘no_set’ doesn’t normalise scores, colour max is max score per
+image set. Defaults to ‘per_image’.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – transparency of colour layer. Defaults to 0.3.</p></li>
+<li><p><strong>score_column</strong> (<em>str</em>) – name of score column to visualise.</p></li>
+<li><p><strong>quadrant</strong> (<em>int</em><em>, </em><em>optional</em>) – If not none, reduces scores to
+scores for quadrant column is quadrant. If None does not limit.
+Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="utils.html"
+                          title="Previous page">&larr; utils</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/visualise.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="utils.html" title="utils"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="modules.html" >Modules</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Visualise patch scores</a></li> 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Ysanne Pritchard.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+</html>

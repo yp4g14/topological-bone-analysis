@@ -1,0 +1,34 @@
+Submodules
+==========
+
+persistent\_homology\_SEDT module
+---------------------------------
+
+.. automodule:: src.persistent_homology_SEDT
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+run\_process module
+-------------------
+
+.. automodule:: src.run_process
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+utils module
+------------
+
+.. automodule:: src.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+visualise\_patch\_scores module
+-------------------------------
+
+.. automodule:: src.visualise_patch_scores
+   :members:
+   :undoc-members:
+   :show-inheritance:

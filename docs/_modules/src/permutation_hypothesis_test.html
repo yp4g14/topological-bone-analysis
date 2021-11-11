@@ -1,0 +1,455 @@
+
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.permutation_hypothesis_test &#8212; topological-bone-analysis  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/cloud.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noticia+Text:400,i,b,bi|Open+Sans:400,i,b,bi|Roboto+Mono:400,i,b,bi&amp;display=swap" type="text/css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+
+    
+    
+     
+        <script src="../../_static/jquery.cookie.js"></script>
+    
+
+    
+     
+        <script src="../../_static/cloud.base.js"></script>
+    
+
+    
+     
+        <script src="../../_static/cloud.js"></script>
+    
+
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head><body>
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+    <li><a href="../../index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.permutation_hypothesis_test</a></li> 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.permutation_hypothesis_test</h1><div class="highlight"><pre>
+<span></span><span class="c1"># randomisation significance testing</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">utils</span> <span class="k">as</span> <span class="nn">ut</span>
+<span class="kn">import</span> <span class="nn">logging</span> 
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span><span class="p">,</span> <span class="n">product</span>
+<span class="kn">from</span> <span class="nn">statsmodels.stats.multitest</span> <span class="kn">import</span> <span class="n">multipletests</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">reload</span>
+<span class="n">reload</span><span class="p">(</span><span class="n">ut</span><span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;significance&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">console</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+<span class="n">stream_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">console</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">stream_formatter</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">rcParams</span>
+<span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;font.size&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">})</span>
+
+<div class="viewcode-block" id="permutation_test"><a class="viewcode-back" href="../../src.html#src.permutation_hypothesis_test.permutation_test">[docs]</a><span class="k">def</span> <span class="nf">permutation_test</span><span class="p">(</span>
+    <span class="n">feat_group1</span><span class="p">,</span>
+    <span class="n">feat_group2</span><span class="p">,</span>
+    <span class="n">metric_func</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">,</span>
+    <span class="n">number_permutations</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+    <span class="n">significance</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">plot_significant</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Permutation significance test</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        feat_group1 (array): feature group 1</span>
+<span class="sd">        feat_group2 (array): features group 2</span>
+<span class="sd">        metric_func (function, optional): How to assess the difference in </span>
+<span class="sd">            the groups. Defaults to np.average (mean).</span>
+<span class="sd">        number_permutations (int, optional): Number of shuffles on pooled data.</span>
+<span class="sd">            Defaults to 10000.</span>
+<span class="sd">        significance (float, optional): significance level, </span>
+<span class="sd">            will only plot histplots if significant. Defaults to 0.05.</span>
+<span class="sd">        path (string, optional): save location path as string. </span>
+<span class="sd">            Defaults to None.</span>
+<span class="sd">        title (string, optional): histplot title. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        p_val (float): pseudo p-value from permutation test.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># difference in features in true split</span>
+    <span class="n">diff_truths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metric_func</span><span class="p">(</span><span class="n">feat_group1</span><span class="p">)</span><span class="o">-</span><span class="n">metric_func</span><span class="p">(</span><span class="n">feat_group2</span><span class="p">))</span>
+
+    <span class="c1"># group all before shuffling</span>
+    <span class="n">feat_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">feat_group1</span><span class="p">)</span> <span class="o">+</span>  <span class="nb">list</span><span class="p">(</span><span class="n">feat_group2</span><span class="p">)</span>
+
+    <span class="c1">#Copy the all features list</span>
+    <span class="n">pool_sample</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">feat_all</span><span class="p">)</span>
+    
+    <span class="c1">#Initialize permutation distribution</span>
+    <span class="n">pool_distribution</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Permutation loop</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">number_permutations</span><span class="p">):</span>
+    <span class="c1"># Shuffle the copy of the all features set</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">pool_sample</span><span class="p">)</span>
+        <span class="c1"># Compute permuted absolute difference of the two sampled distributions</span>
+        <span class="n">pool_distribution</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metric_func</span><span class="p">(</span><span class="n">pool_sample</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">feat_group1</span><span class="p">)])</span>\
+                 <span class="o">-</span> <span class="n">metric_func</span><span class="p">(</span><span class="n">pool_sample</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">feat_group1</span><span class="p">):])))</span>
+
+    <span class="n">p_val</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pool_distribution</span> <span class="o">&gt;=</span> <span class="n">diff_truths</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>\
+        <span class="o">/</span><span class="n">number_permutations</span>
+    <span class="k">if</span> <span class="n">plot_significant</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">p_val</span> <span class="o">&lt;=</span> <span class="n">significance</span><span class="p">:</span>
+            <span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">pool_distribution</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s1">&#39;probability&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Permuted difference&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Proportion&#39;</span><span class="p">)</span>
+            <span class="n">ylims</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span>
+                <span class="n">diff_truths</span><span class="p">,</span>
+                <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">ymax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">diff_truths</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">ylims</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">permutation_hypothesis_tests/</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">p_val</span></div>
+
+<div class="viewcode-block" id="multiple_comparison_correction"><a class="viewcode-back" href="../../src.html#src.permutation_hypothesis_test.multiple_comparison_correction">[docs]</a><span class="k">def</span> <span class="nf">multiple_comparison_correction</span><span class="p">(</span>
+    <span class="n">p_vals_path</span><span class="p">,</span>
+    <span class="n">stats_list</span><span class="p">,</span>
+    <span class="n">logger</span><span class="p">,</span>
+    <span class="n">category_pair</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span>
+    <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This function corrects for the multiple comparison problem between two </span>
+<span class="sd">    categories (specified by category_pair) by using a Benjamini-Hochberg </span>
+<span class="sd">    p-value adjustment at an overall significance (specified by alpha).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        p_vals_path (string): location of p values csv as string</span>
+<span class="sd">        stats_list ([type]): lsit of statistics to adjust over</span>
+<span class="sd">        logger (logger.Logging object): logging</span>
+<span class="sd">        category_pair (tuple): tuple of category names for which to make the </span>
+<span class="sd">            adjustments e.g. (&#39;group_a&#39;,&#39;group_b&#39;) takes all tests between </span>
+<span class="sd">            these two groups and adjusts for the stats in stat_list</span>
+<span class="sd">        alpha (float, optional): Level for p-value adjustment. </span>
+<span class="sd">            Defaults to 0.05.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas DataFrame: dataframe with original and adjusted p vals,</span>
+<span class="sd">         sorted by increasing adjusted p value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># read p_values</span>
+    <span class="n">p_values_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">p_vals_path</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="c1"># restrict p_values to just the one category pair</span>
+    <span class="n">p_values_df</span> <span class="o">=</span> <span class="n">p_values_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+        <span class="p">(</span>
+            <span class="p">(</span><span class="n">p_values_df</span><span class="p">[</span><span class="s1">&#39;category 0&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">category_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span>
+            <span class="p">(</span><span class="n">p_values_df</span><span class="p">[</span><span class="s1">&#39;category 1&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">category_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="p">)</span> <span class="o">|</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">p_values_df</span><span class="p">[</span><span class="s1">&#39;category 0&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">category_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span>
+            <span class="p">(</span><span class="n">p_values_df</span><span class="p">[</span><span class="s1">&#39;category 1&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">category_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="p">)</span>
+    <span class="p">]</span> 
+
+    <span class="c1"># restrict p_values to just the stats columns and quadrants</span>
+    <span class="n">p_values_df</span><span class="p">[</span><span class="s1">&#39;include&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_values_df</span><span class="p">[</span><span class="s1">&#39;stat_col&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stats_list</span><span class="p">)</span>
+    <span class="n">p_values_df</span> <span class="o">=</span> <span class="n">p_values_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">p_values_df</span><span class="p">[</span><span class="s1">&#39;include&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;include&#39;</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">stats_consider_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">product</span><span class="p">(</span><span class="n">stats_list</span><span class="p">,[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]))),</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;stat_col&#39;</span><span class="p">,</span><span class="s1">&#39;quadrant&#39;</span><span class="p">])</span>
+    <span class="n">stats_consider_df</span><span class="p">[</span><span class="s1">&#39;quadrant&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">stats_consider_df</span><span class="p">[</span><span class="s1">&#39;quadrant&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">p_values_df</span> <span class="o">=</span> <span class="n">stats_consider_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+        <span class="n">p_values_df</span><span class="p">,</span>
+        <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+        <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;stat_col&#39;</span><span class="p">,</span> <span class="s1">&#39;quadrant&#39;</span><span class="p">])</span>
+    <span class="n">p_values_df</span> <span class="o">=</span> <span class="n">p_values_df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">p_values_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># adjust the p_values using benjamini-hochberg</span>
+    <span class="n">pvals</span><span class="o">=</span><span class="n">p_values_df</span><span class="p">[</span><span class="s2">&quot;p&quot;</span><span class="p">]</span>
+    <span class="p">(</span><span class="n">reject</span><span class="p">,</span> <span class="n">adjusted_pvals</span><span class="p">,</span><span class="n">alphasidak</span><span class="p">,</span><span class="n">alphabf</span><span class="p">)</span> <span class="o">=</span> <span class="n">multipletests</span><span class="p">(</span>
+        <span class="n">pvals</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s1">&#39;fdr_bh&#39;</span><span class="p">,</span>
+        <span class="n">is_sorted</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">returnsorted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">p_values_df</span><span class="p">[</span><span class="s2">&quot;reject&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reject</span>
+    <span class="n">p_values_df</span><span class="p">[</span><span class="s2">&quot;adjusted_p&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adjusted_pvals</span>
+
+    <span class="n">p_values_df</span> <span class="o">=</span> <span class="n">p_values_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;adjusted_p&quot;</span><span class="p">])</span>
+    <span class="n">p_values_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">p_vals_path</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span><span class="si">}</span><span class="s2">_adjusted_</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">_alpha</span><span class="si">{</span><span class="n">alpha</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">category_pair</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p_values_df</span></div>
+
+<span class="c1"># # # format for use in boxplots:</span>
+<span class="c1"># # p1 = p1[[&#39;stat_col&#39;,&#39;quadrant&#39;,&#39;adjusted_p&#39;]].rename({&#39;adjusted_p&#39;:&#39;SHG_KO&#39;}, axis=1)</span>
+<span class="c1"># # p2 = p2[[&#39;stat_col&#39;,&#39;quadrant&#39;,&#39;adjusted_p&#39;]].rename({&#39;adjusted_p&#39;:&#39;SHG_WT&#39;}, axis=1)</span>
+<span class="c1"># # p3 = p3[[&#39;stat_col&#39;,&#39;quadrant&#39;,&#39;adjusted_p&#39;]].rename({&#39;adjusted_p&#39;:&#39;SHG_male&#39;}, axis=1)</span>
+<span class="c1"># # p4 = p4[[&#39;stat_col&#39;,&#39;quadrant&#39;,&#39;adjusted_p&#39;]].rename({&#39;adjusted_p&#39;:&#39;SHG_female&#39;}, axis=1)</span>
+
+<span class="c1"># # pvals_cond = p1.merge(p2, on=[&#39;stat_col&#39;,&#39;quadrant&#39;], how=&#39;outer&#39;)</span>
+<span class="c1"># # pvals_sex = p3.merge(p4, on=[&#39;stat_col&#39;,&#39;quadrant&#39;], how=&#39;outer&#39;)</span>
+<span class="c1"># # SHG_pvals = pvals_cond.merge(pvals_sex, on=[&#39;stat_col&#39;,&#39;quadrant&#39;], how=&#39;outer&#39;)</span>
+
+<span class="c1"># # p5 = p5[[&#39;stat_col&#39;,&#39;quadrant&#39;,&#39;adjusted_p&#39;]].rename({&#39;adjusted_p&#39;:&#39;TPF_KO&#39;}, axis=1)</span>
+<span class="c1"># # p6 = p6[[&#39;stat_col&#39;,&#39;quadrant&#39;,&#39;adjusted_p&#39;]].rename({&#39;adjusted_p&#39;:&#39;TPF_WT&#39;}, axis=1)</span>
+<span class="c1"># # p7 = p7[[&#39;stat_col&#39;,&#39;quadrant&#39;,&#39;adjusted_p&#39;]].rename({&#39;adjusted_p&#39;:&#39;TPF_male&#39;}, axis=1)</span>
+<span class="c1"># # p8 = p8[[&#39;stat_col&#39;,&#39;quadrant&#39;,&#39;adjusted_p&#39;]].rename({&#39;adjusted_p&#39;:&#39;TPF_female&#39;}, axis=1)</span>
+
+<span class="c1"># # pvals_cond = p5.merge(p6, on=[&#39;stat_col&#39;,&#39;quadrant&#39;], how=&#39;outer&#39;)</span>
+<span class="c1"># # pvals_sex = p7.merge(p8, on=[&#39;stat_col&#39;,&#39;quadrant&#39;], how=&#39;outer&#39;)</span>
+<span class="c1"># # TPF_pvals = pvals_cond.merge(pvals_sex, on=[&#39;stat_col&#39;,&#39;quadrant&#39;], how=&#39;outer&#39;)</span>
+
+<span class="c1"># # all_pvals = TPF_pvals.merge(SHG_pvals, on=[&#39;stat_col&#39;, &#39;quadrant&#39;])</span>
+<span class="c1"># # save_path = &quot;C:/Users/yp4g14/Documents/admin/bone_analysis_paper/adjusted_alpha0.05_p_values_28stats_SHG_TPEF.csv&quot;</span>
+<span class="c1"># # all_pvals.to_csv(save_path)</span>
+
+<div class="viewcode-block" id="group_comparison_permutation_test"><a class="viewcode-back" href="../../src.html#src.permutation_hypothesis_test.group_comparison_permutation_test">[docs]</a><span class="k">def</span> <span class="nf">group_comparison_permutation_test</span><span class="p">(</span>
+    <span class="n">name_maps</span><span class="p">,</span>
+    <span class="n">stat_df</span><span class="p">,</span>
+    <span class="n">save_path</span><span class="p">,</span>
+    <span class="n">logger</span><span class="p">,</span>
+    <span class="n">stats_list_to_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">metric_func</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">,</span>
+    <span class="n">plot_significant</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">adjust_p_vals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span>
+    <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Runs permutation tests between different groups of patches for the </span>
+<span class="sd">    statistics in stat_df. The groups are specified using name_maps, which </span>
+<span class="sd">    should be a dictionary with string filenames as keys with strings of </span>
+<span class="sd">    their categories as values. Will save a .csv of the p values in save_path.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name_maps (dict): keys are filenames as strings, values are categories </span>
+<span class="sd">        as strings</span>
+<span class="sd">        stat_df (pandas DataFrame): dataframe with filenames, patch numbers,</span>
+<span class="sd">        quadrant columns and their corresponding quadrant statistics </span>
+<span class="sd">        each as a column.</span>
+<span class="sd">        save_path (string): location to save p_values.csv as string</span>
+<span class="sd">        logger (logging.Loggger object): logging</span>
+<span class="sd">        stats_list_to_test (list, optional): list of statistic names as strings</span>
+<span class="sd">        to test, if not specified will test all extraneous columns.</span>
+<span class="sd">        Defaults to None.</span>
+<span class="sd">        metric_func (function, optional): measure to use for difference between</span>
+<span class="sd">        groups, usually the mean or median. Defaults to np.average.</span>
+<span class="sd">        plot_significant (bool, optional): Will plot the shuffled distributions</span>
+<span class="sd">        where significant if True, otherwise no plots are generated.</span>
+<span class="sd">        Defaults to False.</span>
+<span class="sd">        adjust_p_vals (bool, optional): Whether to apply the Benjamini-Hochberg</span>
+<span class="sd">        p value adjustment, if True you must specify stats_list_to_test,</span>
+<span class="sd">        and it will adjust for all of these statistics only.</span>
+<span class="sd">        Defaults to True.</span>
+<span class="sd">        alpha (float, optional): overall significance level for p_value</span>
+<span class="sd">        adjustment. Defaults to 0.05.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas DataFrame: p values (and adjusted if adjustment made)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ut</span><span class="o">.</span><span class="n">directory</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">plot_significant</span><span class="p">:</span>
+        <span class="n">ut</span><span class="o">.</span><span class="n">directory</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;permutation_hypothesis_tests/&quot;</span><span class="p">)</span>
+
+    <span class="n">stat_df</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stat_df</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">name_maps</span><span class="p">)</span>
+    <span class="n">categories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">stat_df</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">categories</span><span class="p">)</span><span class="si">}</span><span class="s2"> categories given, expected 2 or more&quot;</span><span class="p">)</span>
+
+    <span class="n">pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">combinations</span><span class="p">(</span><span class="n">categories</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Category combinations to test </span><span class="si">{</span><span class="n">pairs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># pick feature column</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">ignore_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="s1">&#39;quadrant&#39;</span><span class="p">,</span><span class="s1">&#39;patch_number&#39;</span><span class="p">,</span><span class="s1">&#39;category&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">stats_list_to_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">stats_list_to_test</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="n">u</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ignore_cols</span><span class="p">]</span>
+
+    <span class="n">p_vals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">failed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">category_pair</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">quadrant</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">stat_df</span><span class="p">[</span><span class="n">stat_df</span><span class="p">[</span><span class="s1">&#39;quadrant&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">quadrant</span><span class="p">]</span>
+            <span class="n">cat0_allcols</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">category_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">cat1_allcols</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">category_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">stat_col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+                <span class="n">cat0</span> <span class="o">=</span> <span class="n">cat0_allcols</span><span class="p">[[</span><span class="n">stat_col</span><span class="p">]]</span>
+                <span class="n">cat0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cat0</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+                <span class="n">cat1</span> <span class="o">=</span> <span class="n">cat1_allcols</span><span class="p">[[</span><span class="n">stat_col</span><span class="p">]]</span>
+                <span class="n">cat1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cat1</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cat0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cat1</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">):</span> 
+                    <span class="n">test_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">category_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">category_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_Q</span><span class="si">{</span><span class="n">quadrant</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">stat_col</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">permutation_test</span><span class="p">(</span>
+                        <span class="n">cat0</span><span class="p">,</span>
+                        <span class="n">cat1</span><span class="p">,</span>
+                        <span class="n">metric_func</span><span class="p">,</span>
+                        <span class="n">number_permutations</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+                        <span class="n">path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span>
+                        <span class="n">title</span><span class="o">=</span><span class="n">test_name</span><span class="p">,</span>
+                        <span class="n">plot_significant</span><span class="o">=</span><span class="n">plot_significant</span>
+                        <span class="p">)</span>
+                    <span class="n">p_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">quadrant</span><span class="p">,</span>
+                        <span class="n">stat_col</span><span class="p">,</span>
+                        <span class="n">p</span><span class="p">,</span>
+                        <span class="n">categories</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="n">categories</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="mi">10000</span><span class="p">]</span>
+                        <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;test skipped due to len 0 array, </span><span class="si">{</span><span class="n">category_pair</span><span class="si">}</span><span class="s2"> Q</span><span class="si">{</span><span class="n">quadrant</span><span class="si">}</span><span class="s2"> stat </span><span class="si">{</span><span class="n">stat_col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Finished quadrant </span><span class="si">{</span><span class="n">quadrant</span><span class="si">}</span><span class="s2"> tests&quot;</span><span class="p">)</span>
+
+    <span class="n">p_vals</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">p_vals</span><span class="p">,</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;quadrant&#39;</span><span class="p">,</span> <span class="s1">&#39;stat_col&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;category 0&#39;</span><span class="p">,</span><span class="s1">&#39;category 1&#39;</span><span class="p">,</span><span class="s1">&#39;number of permutations&#39;</span><span class="p">])</span>
+    <span class="n">p_vals</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">save_path</span><span class="o">+</span><span class="s1">&#39;p_values.csv&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;p values complete see </span><span class="si">{</span><span class="n">save_path</span><span class="o">+</span><span class="s1">&#39;p_values.csv&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">adjust_p_vals</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">stats_list_to_test</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;p_values could not be adjusted as stats_list_to_test not specified&quot;</span><span class="p">)</span>
+        <span class="n">adjusted_p_vals</span> <span class="o">=</span> <span class="n">multiple_comparison_correction</span><span class="p">(</span>
+            <span class="n">save_path</span><span class="o">+</span><span class="s1">&#39;p_values.csv&#39;</span><span class="p">,</span>
+            <span class="n">stats_list_to_test</span><span class="p">,</span>
+            <span class="n">logger</span><span class="p">,</span>
+            <span class="n">category_pair</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;group_a&#39;</span><span class="p">,</span><span class="s1">&#39;group_b&#39;</span><span class="p">),</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span>
+            <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;adjusted p values complete see </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">adjusted_p_vals</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">p_vals</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">save_path</span> <span class="o">=</span> <span class="s2">&quot;D:/topological-bone-analysis/example/2021_08_26_Time_13_38/&quot;</span>    
+    <span class="n">stats_path</span> <span class="o">=</span> <span class="n">save_path</span><span class="o">+</span><span class="s2">&quot;all_statistics.csv&quot;</span>
+    <span class="n">name_maps</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;example_SHG_1.tif&#39;</span><span class="p">:</span><span class="s1">&#39;group_a&#39;</span><span class="p">,</span> <span class="s1">&#39;example_SHG_2.tif&#39;</span><span class="p">:</span><span class="s1">&#39;group_b&#39;</span><span class="p">}</span>
+    <span class="n">stat_df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">stats_path</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">group_comparison_permutation_test</span><span class="p">(</span>
+    <span class="n">name_maps</span><span class="p">,</span>
+    <span class="n">stat_df</span><span class="p">,</span>
+    <span class="n">save_path</span><span class="p">,</span>
+    <span class="n">logger</span><span class="p">,</span>
+    <span class="n">stats_list_to_test</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;0_num_points&#39;</span><span class="p">,</span><span class="s1">&#39;0_avg_birth&#39;</span><span class="p">,</span><span class="s1">&#39;1_num_points&#39;</span><span class="p">],</span>
+    <span class="n">metric_func</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">,</span>
+    <span class="n">plot_significant</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">adjust_p_vals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span>
+    <span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+    <li><a href="../../index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.permutation_hypothesis_test</a></li> 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Ysanne Pritchard.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+</html>

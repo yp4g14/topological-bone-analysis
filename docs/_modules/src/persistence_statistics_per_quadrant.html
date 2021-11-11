@@ -1,0 +1,272 @@
+
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.persistence_statistics_per_quadrant &#8212; topological-bone-analysis  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/cloud.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noticia+Text:400,i,b,bi|Open+Sans:400,i,b,bi|Roboto+Mono:400,i,b,bi&amp;display=swap" type="text/css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+
+    
+    
+     
+        <script src="../../_static/jquery.cookie.js"></script>
+    
+
+    
+     
+        <script src="../../_static/cloud.base.js"></script>
+    
+
+    
+     
+        <script src="../../_static/cloud.js"></script>
+    
+
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head><body>
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+    <li><a href="../../index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.persistence_statistics_per_quadrant</a></li> 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.persistence_statistics_per_quadrant</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">listdir</span><span class="p">,</span> <span class="n">mkdir</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">exists</span>
+
+<div class="viewcode-block" id="distribution_stats_column"><a class="viewcode-back" href="../../src.html#src.persistence_statistics_per_quadrant.distribution_stats_column">[docs]</a><span class="k">def</span> <span class="nf">distribution_stats_column</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">colname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a dictionary summary of distribution statistics for a numeric</span>
+<span class="sd">     column in a pandas dataframe.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pandas DataFrame): dataframe with column specified by &quot;colname&quot; </span>
+<span class="sd">            e.g. &quot;birth&quot;</span>
+<span class="sd">        dim : [0,1] dimension of persistence diagram df belongs to.</span>
+<span class="sd">        colname : numeric column name as string in df to be summarized with</span>
+<span class="sd">            statistics.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dictionary: statistics keyed by {dim}_{statistic}_{colname}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_avg_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_max_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_min_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_stddev_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+    <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_skew_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">skew</span><span class="p">()</span>
+    <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_kurtosis_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">kurtosis</span><span class="p">()</span>
+    <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_percentile_25_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+    <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_percentile_75_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+    <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_iqr_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> \
+         <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_percentile_75_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>\
+         <span class="o">-</span> <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_percentile_25_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+    
+    <span class="k">for</span> <span class="n">perc</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="mf">0.1</span><span class="o">*</span><span class="n">i</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">)]:</span>
+        <span class="n">summary</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_percentile_</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="n">perc</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">colname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span>\
+            <span class="n">df</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">perc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">summary</span></div>
+
+<div class="viewcode-block" id="quadrant_statistics"><a class="viewcode-back" href="../../src.html#src.persistence_statistics_per_quadrant.quadrant_statistics">[docs]</a><span class="k">def</span> <span class="nf">quadrant_statistics</span><span class="p">(</span>
+    <span class="n">intervals</span><span class="p">,</span>
+    <span class="n">dim</span><span class="p">,</span>
+    <span class="n">filename</span><span class="p">,</span>
+    <span class="n">save_path</span><span class="p">,</span>
+    <span class="n">split_radius</span><span class="o">=-</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Takes in an array of birth, death intervals and calculates statistics</span>
+<span class="sd">    per quadrant (1,2,3 as 4 naturally empty) for each dimension in dim.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        intervals (numpy array): persistence intervals as array </span>
+<span class="sd">            with two columns &#39;birth&#39;, &#39;death&#39;</span>
+<span class="sd">        dim (int): persistence diagram for dimension in [0,1]</span>
+<span class="sd">        filename (string): [description]</span>
+<span class="sd">        split_radius (int, optional): (for quadrant 2 dim 0 only)</span>
+<span class="sd">        will calculate the number of births less than value and</span>
+<span class="sd">        number of births greater than or equal to value.</span>
+<span class="sd">        Defaults to -2.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        pandas DataFrame: topological statistics calculated per quadrant.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># split into quadrants:</span>
+    <span class="n">Q1</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">intervals</span><span class="p">[</span><span class="s2">&quot;birth&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">Q2</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">intervals</span><span class="p">[</span><span class="s2">&quot;birth&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">intervals</span><span class="p">[</span><span class="s2">&quot;death&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)]</span>
+    <span class="n">Q3</span> <span class="o">=</span> <span class="n">intervals</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">intervals</span><span class="p">[</span><span class="s2">&quot;birth&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">intervals</span><span class="p">[</span><span class="s2">&quot;death&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)]</span>
+
+    <span class="n">intervals_quadrants</span> <span class="o">=</span> <span class="p">[</span><span class="n">Q1</span><span class="p">,</span><span class="n">Q2</span><span class="p">,</span><span class="n">Q3</span><span class="p">]</span>
+    <span class="n">stats_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># for each quadrant calculate the statistics in a dictionary</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">quadrant</span> <span class="o">=</span> <span class="n">intervals_quadrants</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">stats_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">stats_dict</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">3</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s2">&quot;.tif&quot;</span>
+        <span class="n">stats_dict</span><span class="p">[</span><span class="s2">&quot;patch_number&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">stats_dict</span><span class="p">[</span><span class="s2">&quot;quadrant&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">quadrant</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># number of points</span>
+            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_num_points&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">quadrant</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># birth statistics</span>
+            <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_avg_birth&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                 <span class="n">quadrant</span><span class="p">[</span><span class="s2">&quot;birth&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="n">quadrant</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">birth_stats</span> <span class="o">=</span> <span class="n">distribution_stats_column</span><span class="p">(</span>
+                <span class="n">quadrant</span><span class="p">,</span>
+                <span class="n">dim</span><span class="p">,</span>
+                <span class="s2">&quot;birth&quot;</span>
+                <span class="p">)</span>
+            <span class="n">stats_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">birth_stats</span><span class="p">)</span>
+
+            <span class="c1"># remove inf death</span>
+            <span class="n">finite_quadrant</span> <span class="o">=</span> <span class="n">quadrant</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">finite_quadrant</span> <span class="o">=</span> <span class="n">finite_quadrant</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="n">finite_quadrant</span><span class="p">[</span><span class="s2">&quot;death&quot;</span><span class="p">]</span><span class="o">!=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+                <span class="p">]</span>
+            <span class="k">if</span> <span class="n">finite_quadrant</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># death statistics</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_avg_death&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                    <span class="n">finite_quadrant</span><span class="p">[</span><span class="s2">&quot;death&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="p">(</span><span class="n">finite_quadrant</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+                <span class="n">death_stats</span> <span class="o">=</span> <span class="n">distribution_stats_column</span><span class="p">(</span>
+                    <span class="n">finite_quadrant</span><span class="p">,</span>
+                    <span class="n">dim</span><span class="p">,</span>
+                    <span class="s2">&quot;death&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">stats_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">death_stats</span><span class="p">)</span>
+                
+                <span class="c1">#lifetime = death - birth</span>
+                <span class="n">finite_quadrant</span><span class="p">[</span><span class="s2">&quot;lifetime&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                    <span class="n">finite_quadrant</span><span class="p">[</span><span class="s2">&quot;death&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">finite_quadrant</span><span class="p">[</span><span class="s2">&quot;birth&quot;</span><span class="p">]</span>
+
+                <span class="c1">#total persistance is the sum of all lifetimes</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_total_persistence&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                    <span class="n">finite_quadrant</span><span class="o">.</span><span class="n">sum</span><span class="p">()[</span><span class="s2">&quot;lifetime&quot;</span><span class="p">]</span>
+
+                <span class="c1"># normalized_lifespan = (death - birth)/ sum_all(death-birth)</span>
+                <span class="n">finite_quadrant</span><span class="p">[</span><span class="s2">&quot;normalized_lifespan&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                    <span class="n">finite_quadrant</span><span class="p">[</span><span class="s2">&quot;lifetime&quot;</span><span class="p">]</span><span class="o">/</span><span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_total_persistence&quot;</span><span class="p">]</span>
+
+                <span class="c1">#let p be the normalised lifespan - persistent entropy </span>
+                <span class="c1"># can be viewed as the diversity of lifespans</span>
+                <span class="n">finite_quadrant</span><span class="p">[</span><span class="s2">&quot;plogp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">finite_quadrant</span><span class="p">[</span><span class="s2">&quot;normalized_lifespan&quot;</span><span class="p">]</span><span class="o">*</span>\
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">finite_quadrant</span><span class="p">[</span><span class="s2">&quot;normalized_lifespan&quot;</span><span class="p">])</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_pers_entropy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">finite_quadrant</span><span class="p">[</span><span class="s2">&quot;plogp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+            <span class="c1">#number of births in quadrant 2 dim 0, </span>
+            <span class="c1"># less than equal to radius split and greater than radius split</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dim</span><span class="o">==</span><span class="mi">0</span><span class="p">):</span>
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_num_points_less_eq_</span><span class="si">{</span><span class="n">split_radius</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                     <span class="n">quadrant</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">quadrant</span><span class="p">[</span><span class="s2">&quot;birth&quot;</span><span class="p">]</span><span class="o">&lt;=</span><span class="n">split_radius</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="n">stats_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">_num_points_greater_</span><span class="si">{</span><span class="n">split_radius</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span>\
+                     <span class="n">quadrant</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">quadrant</span><span class="p">[</span><span class="s2">&quot;birth&quot;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">split_radius</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1">#convert to DataFrame</span>
+            <span class="n">stats_dict</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">stats_dict</span><span class="p">])</span>
+            <span class="n">stats_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stats_dict</span><span class="p">)</span>
+
+    <span class="c1"># combine all stats into a single DataFrame</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stats_list</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">stats_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">stats_list</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">stats_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">save_path</span><span class="si">}{</span><span class="n">filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span><span class="si">}</span><span class="s2">_statistics.csv&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+    <li><a href="../../index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.persistence_statistics_per_quadrant</a></li> 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Ysanne Pritchard.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+</html>

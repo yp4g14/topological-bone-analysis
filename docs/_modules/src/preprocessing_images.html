@@ -1,0 +1,389 @@
+
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.preprocessing_images &#8212; topological-bone-analysis  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/cloud.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noticia+Text:400,i,b,bi|Open+Sans:400,i,b,bi|Roboto+Mono:400,i,b,bi&amp;display=swap" type="text/css" />
+    
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+
+    
+    
+     
+        <script src="../../_static/jquery.cookie.js"></script>
+    
+
+    
+     
+        <script src="../../_static/cloud.base.js"></script>
+    
+
+    
+     
+        <script src="../../_static/cloud.js"></script>
+    
+
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head><body>
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+    <li><a href="../../index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.preprocessing_images</a></li> 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.preprocessing_images</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">ndimage</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">ceil</span><span class="p">,</span> <span class="n">floor</span>
+<span class="kn">from</span> <span class="nn">skimage.util</span> <span class="kn">import</span> <span class="n">view_as_windows</span>
+<span class="kn">from</span> <span class="nn">skimage.filters</span> <span class="kn">import</span> <span class="n">threshold_otsu</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">listdir</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">isfile</span><span class="p">,</span> <span class="n">join</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">utils</span> <span class="k">as</span> <span class="nn">ut</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">reload</span>
+<span class="n">reload</span><span class="p">(</span><span class="n">ut</span><span class="p">)</span>
+
+<div class="viewcode-block" id="trim"><a class="viewcode-back" href="../../src.html#src.preprocessing_images.trim">[docs]</a><span class="k">def</span> <span class="nf">trim</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">,</span>
+    <span class="n">edge_val</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Trims an image array removing full rows and columns containing edge_val</span>
+<span class="sd">     from the borders</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image (numpy array): image as numpy array</span>
+<span class="sd">        edge_val (int, optional): The edge value to trim. Defaults to 0.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        image as numpy array: trimmed image</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">edge_cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">((</span><span class="n">image</span><span class="o">!=</span><span class="n">edge_val</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">edge_rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">((</span><span class="n">image</span><span class="o">!=</span><span class="n">edge_val</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">non_zero_cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">edge_cols</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">non_zero_rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">edge_rows</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">left_trim</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">non_zero_cols</span><span class="p">)</span>
+    <span class="n">right_trim</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">non_zero_cols</span><span class="p">)</span>
+
+    <span class="n">top_trim</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">non_zero_rows</span><span class="p">)</span>
+    <span class="n">bottom_trim</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">non_zero_rows</span><span class="p">)</span>
+
+    <span class="n">trimmed_image</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">top_trim</span><span class="p">:</span><span class="n">bottom_trim</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">left_trim</span><span class="p">:</span><span class="n">right_trim</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">trimmed_image</span></div>
+
+<div class="viewcode-block" id="otsu_threshold"><a class="viewcode-back" href="../../src.html#src.preprocessing_images.otsu_threshold">[docs]</a><span class="k">def</span> <span class="nf">otsu_threshold</span><span class="p">(</span>
+    <span class="n">image</span>
+    <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Takes a grayscale image and binarizes using Otsu&#39;s threshold.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image (numpy array): grayscale image (numpy array)</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        binary_image (numpy array): binary ([0,1]) image (numpy array)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">threshold_val</span> <span class="o">=</span> <span class="n">threshold_otsu</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">binary_image</span> <span class="o">=</span> <span class="p">(</span><span class="n">image</span> <span class="o">&gt;</span> <span class="n">threshold_val</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">binary_image</span></div>
+
+<div class="viewcode-block" id="minimum_threshold"><a class="viewcode-back" href="../../src.html#src.preprocessing_images.minimum_threshold">[docs]</a><span class="k">def</span> <span class="nf">minimum_threshold</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Takes a grayscale image and binarizes using minimum method from the</span>
+<span class="sd">    skimage.filters</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image (numpy array): grayscale image (numpy array)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        binary_image (numpy array): binary ([0,1]) image (numpy array)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">skimage.filters</span> <span class="kn">import</span> <span class="n">threshold_minimum</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">threshold_minimum</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">binary_im</span> <span class="o">=</span> <span class="p">(</span><span class="n">image</span> <span class="o">&gt;</span> <span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">binary_im</span></div>
+
+<div class="viewcode-block" id="extract_patches"><a class="viewcode-back" href="../../src.html#src.preprocessing_images.extract_patches">[docs]</a><span class="k">def</span> <span class="nf">extract_patches</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">,</span>
+    <span class="n">patch_shape</span><span class="p">,</span>
+    <span class="n">pad_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">stride</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes a 2D image array and cuts it into non-overlapping square patches </span>
+<span class="sd">    of patch_shape. To do this it first pads image to be exact multiples of the</span>
+<span class="sd">    patch shape in each direction. The image is padded with the constant </span>
+<span class="sd">    pad_val, which defaults to 0</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image (numpy array): numpy array of image</span>
+<span class="sd">        patch_shape (int) : length (width) of desired square patches.</span>
+<span class="sd">        pad_val (int, optional): value in [0,1] that pads the binary image. </span>
+<span class="sd">            efaults to 0.</span>
+<span class="sd">        stride (int, optional): stride across image before taking next patch. </span>
+<span class="sd">            Defaults to patch_shape so patches don&#39;t overlap</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        image : (array) padded image</span>
+<span class="sd">        patches : (array) array of patches, patches[i] will return i^th patch.</span>
+<span class="sd">        patch_coords : list of all patch coordinates (top left per patch)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="c1"># pad image</span>
+    <span class="n">length_to_add</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">num_rows</span><span class="o">/</span><span class="n">patch_shape</span><span class="p">)</span><span class="o">*</span><span class="n">patch_shape</span> <span class="o">-</span> <span class="n">num_rows</span>
+    <span class="n">width_to_add</span> <span class="o">=</span> <span class="n">ceil</span><span class="p">(</span><span class="n">num_cols</span><span class="o">/</span><span class="n">patch_shape</span><span class="p">)</span><span class="o">*</span><span class="n">patch_shape</span> <span class="o">-</span> <span class="n">num_cols</span>
+
+    <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">image</span><span class="p">,</span>
+                    <span class="p">((</span><span class="n">ceil</span><span class="p">(</span><span class="n">length_to_add</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="n">floor</span><span class="p">(</span><span class="n">length_to_add</span><span class="o">/</span><span class="mi">2</span><span class="p">)),</span>
+                        <span class="p">(</span><span class="n">ceil</span><span class="p">(</span><span class="n">width_to_add</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="n">floor</span><span class="p">(</span><span class="n">width_to_add</span><span class="o">/</span><span class="mi">2</span><span class="p">))),</span>
+                    <span class="s1">&#39;constant&#39;</span><span class="p">,</span>
+                    <span class="n">constant_values</span><span class="o">=</span><span class="p">(</span><span class="n">pad_val</span><span class="p">,</span><span class="n">pad_val</span><span class="p">))</span>
+    <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span>
+    
+    <span class="c1"># take patches of padded image</span>
+    <span class="k">if</span> <span class="n">stride</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">stride</span><span class="o">=</span><span class="n">patch_shape</span>
+
+    <span class="n">patches</span> <span class="o">=</span> <span class="n">view_as_windows</span><span class="p">(</span><span class="n">image</span><span class="p">,</span>
+                              <span class="n">patch_shape</span><span class="p">,</span>
+                              <span class="n">stride</span><span class="p">)</span>
+
+    <span class="n">p_num_rows</span><span class="p">,</span> <span class="n">p_num_cols</span><span class="p">,</span> <span class="n">patch_height</span><span class="p">,</span> <span class="n">patch_width</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">num_patches</span> <span class="o">=</span> <span class="n">p_num_rows</span> <span class="o">*</span> <span class="n">p_num_cols</span>
+    <span class="n">patches</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">patches</span><span class="p">,</span> <span class="p">(</span><span class="n">num_patches</span><span class="p">,</span> <span class="n">patch_height</span><span class="p">,</span> <span class="n">patch_width</span><span class="p">))</span>
+    
+    <span class="c1"># get the coordinates of all the patches</span>
+    <span class="n">col_coords</span> <span class="o">=</span> <span class="n">get_coords</span><span class="p">(</span><span class="n">stride</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">,</span> <span class="n">patch_shape</span><span class="p">)</span>
+    <span class="n">row_coords</span> <span class="o">=</span> <span class="n">get_coords</span><span class="p">(</span><span class="n">stride</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">,</span> <span class="n">patch_shape</span><span class="p">)</span>
+    <span class="n">patch_coords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">product</span><span class="p">(</span><span class="n">row_coords</span><span class="p">,</span> <span class="n">col_coords</span><span class="p">))</span>
+    
+    <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">patches</span><span class="p">,</span> <span class="n">patch_coords</span></div>
+
+<div class="viewcode-block" id="get_coords"><a class="viewcode-back" href="../../src.html#src.preprocessing_images.get_coords">[docs]</a><span class="k">def</span> <span class="nf">get_coords</span><span class="p">(</span>
+    <span class="n">stride</span><span class="p">,</span>
+    <span class="n">axis_size</span><span class="p">,</span>
+    <span class="n">patch_shape</span>
+    <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculates top left patch coordinate for image with axis size length,</span>
+<span class="sd">    with patch_shape sized patches.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stride (int): stride between patches</span>
+<span class="sd">        axis_size (int): length of axis to cut into patches</span>
+<span class="sd">        patch_shape (int): length of patch</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy array: coordinates along axis of patches length patch_shape,</span>
+<span class="sd">            stride distance apart </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="n">base_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="p">(</span><span class="n">patch_shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">axis_size</span><span class="o">/</span><span class="n">patch_shape</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="p">)</span>
+    <span class="n">offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">patch_shape</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">stride</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="n">offsets</span><span class="p">:</span>
+        <span class="n">starts</span> <span class="o">=</span> <span class="n">base_coords</span> <span class="o">+</span> <span class="n">offset</span>
+        <span class="n">starts</span> <span class="o">=</span> <span class="n">starts</span><span class="p">[</span><span class="n">starts</span> <span class="o">&lt;=</span> <span class="n">axis_size</span> <span class="o">-</span> <span class="n">patch_shape</span><span class="p">]</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">coords</span><span class="p">,</span> <span class="n">starts</span><span class="p">])</span>
+
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">coords</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">coords</span></div>
+
+<div class="viewcode-block" id="SEDT"><a class="viewcode-back" href="../../src.html#src.preprocessing_images.SEDT">[docs]</a><span class="k">def</span> <span class="nf">SEDT</span><span class="p">(</span>
+    <span class="n">image</span>
+    <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates a Signed Euclidean Distance Transform of an image array.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image : (numpy array) binary image to transform.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        sedt_image : (numpy array) SEDT of image.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">inverse_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">image</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">edt_1_to_0</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">distance_transform_edt</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">edt_0_to_1</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">distance_transform_edt</span><span class="p">(</span><span class="n">inverse_image</span><span class="p">)</span>
+
+    <span class="c1"># negative distances for 0 (pore/air) to 1 (material)</span>
+    <span class="n">edt_0_to_1</span> <span class="o">=</span> <span class="o">-</span> <span class="n">edt_0_to_1</span>
+
+    <span class="c1"># where image is True (material) replace the distance </span>
+    <span class="c1"># with distance from material to pore/air</span>
+    <span class="n">neg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">inverse_image</span><span class="p">,</span> <span class="n">edt_0_to_1</span><span class="p">)</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">edt_1_to_0</span><span class="p">)</span>
+    <span class="n">sedt</span> <span class="o">=</span> <span class="n">neg</span><span class="o">+</span><span class="n">pos</span>
+    <span class="k">return</span> <span class="n">sedt</span></div>
+
+<div class="viewcode-block" id="image_to_patches"><a class="viewcode-back" href="../../src.html#src.preprocessing_images.image_to_patches">[docs]</a><span class="k">def</span> <span class="nf">image_to_patches</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">,</span>
+    <span class="n">filename</span><span class="p">,</span>
+    <span class="n">logger</span><span class="p">,</span>
+    <span class="n">patch_shape</span><span class="p">,</span>
+    <span class="n">stride</span><span class="p">,</span>
+    <span class="n">pad_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">percentage_background</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">background_val</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">trim_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">edge_val</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">binary_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">+</span><span class="s1">&#39;binary/&#39;</span>
+    <span class="n">padded_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">+</span><span class="s1">&#39;padded/&#39;</span>
+    <span class="n">patch_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">+</span><span class="s1">&#39;patches/&#39;</span>
+
+    <span class="c1">#make parameter list to save in run output location</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;path: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+              <span class="sa">f</span><span class="s2">&quot;patch shape: </span><span class="si">{</span><span class="n">patch_shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+              <span class="sa">f</span><span class="s2">&quot;stride: </span><span class="si">{</span><span class="n">stride</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+              <span class="sa">f</span><span class="s2">&quot;percentage background: </span><span class="si">{</span><span class="n">percentage_background</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+              <span class="sa">f</span><span class="s2">&quot;background threshold: </span><span class="si">{</span><span class="n">background_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+    <span class="c1"># get files</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">import_images</span><span class="p">(</span><span class="n">binary_path</span><span class="p">,</span> <span class="p">[</span><span class="n">filename</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="c1"># OPTIONAL TRIM FUNCTION </span>
+    <span class="k">if</span> <span class="n">trim_first</span> <span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">trim</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">edge_val</span><span class="p">)</span>
+
+    <span class="c1">#total pixels per patch</span>
+    <span class="n">total_pixels</span> <span class="o">=</span> <span class="n">patch_shape</span><span class="o">**</span><span class="mi">2</span>
+    
+    <span class="c1"># extracts square patches size patch_size x patch_size stride distance apart</span>
+    <span class="n">padded_image</span><span class="p">,</span> <span class="n">patches</span><span class="p">,</span> <span class="n">coords</span> <span class="o">=</span> <span class="n">extract_patches</span><span class="p">(</span>
+        <span class="n">image</span><span class="p">,</span>
+        <span class="n">patch_shape</span><span class="p">,</span>
+        <span class="n">pad_val</span><span class="o">=</span><span class="n">pad_val</span><span class="p">,</span>
+        <span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">)</span>
+    
+    <span class="c1"># check number of coordinates found is the same as number of patches taken</span>
+    <span class="k">if</span> <span class="n">patches</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">patches</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> patches found</span><span class="se">\</span>
+<span class="s2">        but </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span><span class="si">}</span><span class="s2"> coordinates found&quot;</span><span class="p">)</span>
+
+    <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">padded_image</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">padded_path</span><span class="o">+</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">im_shape</span> <span class="o">=</span> <span class="n">padded_image</span><span class="o">.</span><span class="n">shape</span>
+    <span class="c1"># test for a single patch if the percentage of pixels</span>
+    <span class="c1"># under the background threshold is more than percentage_background permitted</span>
+    <span class="n">patch_index</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">patches_discarded</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">patches</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="c1"># how much of the patch is background?</span>
+        <span class="n">patch_background_percentage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">patch</span> <span class="o">&lt;=</span> <span class="n">background_val</span><span class="p">)</span><span class="o">/</span><span class="n">total_pixels</span>
+        <span class="c1"># is the patch low enough background to save?</span>
+        <span class="k">if</span>  <span class="p">(</span><span class="n">patch_background_percentage</span> <span class="o">&lt;</span> <span class="n">percentage_background</span><span class="p">):</span>
+            <span class="c1">#save patch as image</span>
+            <span class="n">image_patch</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
+            <span class="n">image_patch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">patch_path</span><span class="si">}{</span><span class="n">filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="s1">&#39;</span><span class="si">{:03d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">patch_index</span><span class="p">)</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">patch_coords.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">im_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">im_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">patch_index</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">patch_shape</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">patch_shape</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">coords</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">coords</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1">#increment index for save filename only if index has been used</span>
+            <span class="n">patch_index</span> <span class="o">+=</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">patches_discarded</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;image: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> completed, </span><span class="se">\</span>
+<span class="s2">                </span><span class="si">{</span><span class="n">patch_index</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2"> patches saved, </span><span class="se">\</span>
+<span class="s2">                </span><span class="si">{</span><span class="n">patches_discarded</span><span class="si">}</span><span class="s2"> patches discarded&quot;</span><span class="p">)</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;image: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> completed, </span><span class="se">\</span>
+<span class="s2">                </span><span class="si">{</span><span class="n">patch_index</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2"> patches saved, </span><span class="se">\</span>
+<span class="s2">                </span><span class="si">{</span><span class="n">patches_discarded</span><span class="si">}</span><span class="s2"> patches discarded&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="o">+</span><span class="s2">&quot;patch_params.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">filehandle</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">filehandle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">param</span><span class="p">)</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+    <li><a href="../../index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">src.preprocessing_images</a></li> 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Ysanne Pritchard.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+</html>

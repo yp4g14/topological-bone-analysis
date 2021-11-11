@@ -1,0 +1,426 @@
+
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Submodules &#8212; topological-bone-analysis  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/cloud.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noticia+Text:400,i,b,bi|Open+Sans:400,i,b,bi|Roboto+Mono:400,i,b,bi&amp;display=swap" type="text/css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+
+    
+    
+     
+        <script src="_static/jquery.cookie.js"></script>
+    
+
+    
+     
+        <script src="_static/cloud.base.js"></script>
+    
+
+    
+     
+        <script src="_static/cloud.js"></script>
+    
+
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Persistence Statistics per Quadrant module" href="persistence_statistics_per_quadrant.html" />
+    <link rel="prev" title="Modules" href="modules.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head><body>
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="persistence_statistics_per_quadrant.html" title="Persistence Statistics per Quadrant module"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="modules.html" title="Modules"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">Modules</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Submodules</a></li> 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="submodules">
+<h1>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h1>
+<section id="module-src.persistent_homology_SEDT">
+<span id="persistent-homology-sedt-module"></span><h2>persistent_homology_SEDT module<a class="headerlink" href="#module-src.persistent_homology_SEDT" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.persistent_homology_SEDT.peristent_homology_sublevel_cubic">
+<span class="sig-prename descclassname"><span class="pre">src.persistent_homology_SEDT.</span></span><span class="sig-name descname"><span class="pre">peristent_homology_sublevel_cubic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_persistence_diagrams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/persistent_homology_SEDT.html#peristent_homology_sublevel_cubic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.persistent_homology_SEDT.peristent_homology_sublevel_cubic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate sublevel set cubical homology persistence for an image
+Image should already have undergone SEDT for SEDT transform filtration
+Takes the idiagram file and pulls out the birth,death persistence intervals
+for two dimensions (0,1). Saves the persistence intervals as csv.
+Optionally plots the persistence diagrams and saves as svg.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>numpy array</em>) – image values along which to take the filtration</p></li>
+<li><p><strong>filename</strong> (<em>string</em>) – filename for image as string</p></li>
+<li><p><strong>save_path</strong> (<em>string</em>) – location to save necessary files as string</p></li>
+<li><p><strong>plot_persistence_diagrams</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True saves plots of the
+persistence diagram. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.run_process">
+<span id="run-process-module"></span><h2>run_process module<a class="headerlink" href="#module-src.run_process" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.run_process.topological_porosity_analysis">
+<span class="sig-prename descclassname"><span class="pre">src.run_process.</span></span><span class="sig-name descname"><span class="pre">topological_porosity_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_persistence_diagrams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classification</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filenames_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strat_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stratkfold'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_grid_SVC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'C':</span> <span class="pre">[1,</span> <span class="pre">2,</span> <span class="pre">3],</span> <span class="pre">'kernel':</span> <span class="pre">('rbf',</span> <span class="pre">'linear')}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/run_process.html#topological_porosity_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.run_process.topological_porosity_analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a set of grayscale images, or a single file,
+thresholds to binary with threshold_func
+optionally trims the binary images of background_val
+pads them into exact multiples of patch_shape
+and then cuts them into square patches stride apart.
+Each binary patch is transformed with a Signed Euclidean Distance transform
+before the persistent homology is calculated using cubical complexes
+with the filtration built over sublevel sets of the SEDT transformed patch.
+The persistence birth, death intervals are saved out for 0 and 1 homology,
+and the persistence diagrams are made and optionally plotted.
+Summary statistics of these intervals are calculated per quadrant.
+split radius calculates the number of points in quadrant 2 of H_0
+in [-inf, split_radius] and (split_radius, 0].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>string</em>) – location as a string of grayscale images as .tiff files</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger object</em>) – logs the process</p></li>
+<li><p><strong>threshold_func</strong> (<em>function</em>) – takes in a numpy array of a grayscale image
+and returns a binary image</p></li>
+<li><p><strong>patch_shape</strong> (<em>int</em><em>, </em><em>optional</em>) – pixel length and width of patches to take.
+Defaults to 300.</p></li>
+<li><p><strong>background_val</strong> (<em>int</em><em>, </em><em>optional</em>) – value [0,1] of image that is background
+after binary. Defaults to 0.</p></li>
+<li><p><strong>stride</strong> (<em>int</em><em>, </em><em>optional</em>) – number of pixels to move accross/down image
+before taking next patch. Defaults to None.</p></li>
+<li><p><strong>trim</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether to trim empty rows and columns before
+padding to take patches. Defaults to True.</p></li>
+<li><p><strong>single_file</strong> (<em>string</em><em>, </em><em>optional</em>) – filename if single file not all images
+in path location. Defaults to None.</p></li>
+<li><p><strong>split_radius</strong> (<em>int</em><em>, </em><em>optional</em>) – split radius calculates the number of
+points in quadrant 2 of H_0 in [-inf, split_radius] and
+(split_radius, 0]. Defaults to -2.</p></li>
+<li><p><strong>save_persistence_diagrams</strong> (<em>bool</em><em>, </em><em>optional</em>) – saves plots of persistence
+diagrams. Defaults to False.</p></li>
+<li><p><strong>analysis_plots</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True saves box plots comparing groups
+defined by filenames map. Defaults to False</p></li>
+<li><p><strong>classification</strong> (<em>bool</em><em>, </em><em>optional</em>) – into groups (filenames_map) using the specified feature_cols,
+with runs, strat_col, cross_val and param_grid_SVC specifying
+parameters. Defaults to False.</p></li>
+<li><p><strong>feature_cols</strong> (<em>list</em><em>, </em><em>optional</em>) – If list of string statistic names, will use specified.</p></li>
+<li><p><strong>filenames_map</strong> (<em>dict</em><em>, </em><em>optional</em>) – (string) as keys, and a group name as values.</p></li>
+<li><p><strong>runs</strong> (<em>optional</em><em>, </em><em>int</em>) – </p></li>
+<li><p><strong>strat_col</strong> (<em>optional</em><em>, </em><em>string</em>) – </p></li>
+<li><p><strong>cross_val</strong> (<em>optional</em><em>, </em><em>string</em>) – </p></li>
+<li><p><strong>to</strong> (<em>param_grid_SVC</em><em> (</em><em>parameter grid to train SVC. Defaults</em>) – {‘C’: [1,2,3], ‘kernel’: (‘rbf’,’linear’)}</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>topological statistics per quadrant for .tiff image</dt><dd><p>files in path</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.utils">
+<span id="utils-module"></span><h2>utils module<a class="headerlink" href="#module-src.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.check_ext">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">check_ext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filenames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extensions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#check_ext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.check_ext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks each filename in filenames list has an extension in extensions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filenames</strong> (<em>list</em>) – list of filenames as strings</p></li>
+<li><p><strong>extensions</strong> (<em>list</em>) – list of suitable extensions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>filenames with correct extensions</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.combine_stats_files">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">combine_stats_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#combine_stats_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.combine_stats_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combines statistics per image patch into a DataFrame of all statistics</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>string</em>) – location of stats files to combine</p></li>
+<li><p><strong>save_path</strong> (<em>string</em>) – </p></li>
+<li><p><strong>save_name</strong> (<em>string</em>) – filename to save as csv</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>all statistics in a dataframe</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas DatFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.directory">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a directory if doesn’t exist</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>string</em>) – location to create</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.find_files">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">find_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files_to_find</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#find_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.find_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function looks for file names in files_to_find list in the path directory.
+If a file is not found, updates the logger with a warning.
+Updates the logger with info on which files were found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>files_to_find</strong> (<em>list of strings containing file names we are looking for.</em>) – </p></li>
+<li><p><strong>path</strong> (<em>string of path diretory where files should be.</em>) – </p></li>
+<li><p><strong>logger</strong> (<em>logger object.</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>found_files</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of file names that exist in the directory.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.import_images">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">import_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filenames</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/utils.html#import_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.utils.import_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens files from filenames list located in path directory.
+Converts to grayscale and adds them to list images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>stirng</em>) – location of image files</p></li>
+<li><p><strong>filenames</strong> (<em>list</em>) – list of image filenames as strings</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.visualise_patch_scores">
+<span id="visualise-patch-scores-module"></span><h2>visualise_patch_scores module<a class="headerlink" href="#module-src.visualise_patch_scores" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.visualise_patch_scores.plot_patch_scores">
+<span class="sig-prename descclassname"><span class="pre">src.visualise_patch_scores.</span></span><span class="sig-name descname"><span class="pre">plot_patch_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bwr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalise_scores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'per_image'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'score'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/visualise_patch_scores.html#plot_patch_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.visualise_patch_scores.plot_patch_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a single visualisation of patch scores on an image.
+The full image scores are created by averaging the scores
+for overlapping patches and alpha blending ontop of original image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>numpy array</em>) – full image as array</p></li>
+<li><p><strong>image_name</strong> (<em>string</em>) – image filename</p></li>
+<li><p><strong>scores</strong> (<em>pandas DataFrame</em>) – scores to overlay as colour layer</p></li>
+<li><p><strong>save_path</strong> (<em>string</em>) – location to save the visualisation as string</p></li>
+<li><p><strong>logger</strong> (<em>logging.logger object</em>) – logging</p></li>
+<li><p><strong>colour</strong> (<em>str</em><em>, </em><em>optional</em>) – colourscheme to plot scores. Defaults to ‘bwr’.</p></li>
+<li><p><strong>normalise_scores</strong> (<em>str</em><em>, </em><em>optional</em>) – normalise scores options
+‘per_image’ normalises the scores per image
+‘per_set’ normalises the scores per image set contained in scores
+‘no’ doesn’t normalise scores, colour max is max score per image
+‘no_set’ doesn’t normalise scores, colour max is max score per
+image set. Defaults to ‘per_image’.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – transparency of colour layer. Defaults to 0.3.</p></li>
+<li><p><strong>score_column</strong> (<em>str</em>) – name of score column to visualise.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.visualise_patch_scores.visualise_patch_scores">
+<span class="sig-prename descclassname"><span class="pre">src.visualise_patch_scores.</span></span><span class="sig-name descname"><span class="pre">visualise_patch_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bwr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalise_scores</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'per_image'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'score'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quadrant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/visualise_patch_scores.html#visualise_patch_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.visualise_patch_scores.visualise_patch_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualises patch scores on a full image.
+Takes paths to the images/scores csvs and reads the data.
+Combines the scores and patch coordinates on filename and
+patch_number columns. Calls create_visualisations_patch_scores per image,
+which will save a visualisation of the patch scores on the full image
+in directory save_path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logger.logging object</em>) – logging</p></li>
+<li><p><strong>image_path</strong> (<em>string</em>) – location of full images as string</p></li>
+<li><p><strong>patch_path</strong> (<em>string</em>) – location of patches as string</p></li>
+<li><p><strong>score_path</strong> (<em>string</em>) – location of ‘scores’ per patch as string</p></li>
+<li><p><strong>save_path</strong> (<em>string</em>) – location to save visualisations as string</p></li>
+<li><p><strong>colour</strong> (<em>str</em><em>, </em><em>optional</em>) – matplotlib colourscheme.</p></li>
+<li><p><strong>red.</strong> (<em>Defaults to 'bwr' for blue white</em>) – </p></li>
+<li><p><strong>normalise_scores</strong> (<em>str</em><em>, </em><em>optional</em>) – normalise scores options
+‘per_image’ normalises the scores per image
+‘per_set’ normalises the scores per image set contained in scores
+‘no’ doesn’t normalise scores, colour max is max score per image
+‘no_set’ doesn’t normalise scores, colour max is max score per
+image set. Defaults to ‘per_image’.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em><em>, </em><em>optional</em>) – transparency of colour layer. Defaults to 0.3.</p></li>
+<li><p><strong>score_column</strong> (<em>str</em>) – name of score column to visualise.</p></li>
+<li><p><strong>quadrant</strong> (<em>int</em><em>, </em><em>optional</em>) – If not none, reduces scores to
+scores for quadrant column is quadrant. If None does not limit.
+Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="sphinx-toc sphinxlocaltoc">
+    <h3><a href="index.html">Page contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Submodules</a><ul>
+<li><a class="reference internal" href="#module-src.persistent_homology_SEDT">persistent_homology_SEDT module</a></li>
+<li><a class="reference internal" href="#module-src.run_process">run_process module</a></li>
+<li><a class="reference internal" href="#module-src.utils">utils module</a></li>
+<li><a class="reference internal" href="#module-src.visualise_patch_scores">visualise_patch_scores module</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="modules.html"
+                          title="Previous page">&larr; Modules</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="persistence_statistics_per_quadrant.html"
+                          title="Next page">&rarr; Persistence Statistics per Quadrant module</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/src.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="persistence_statistics_per_quadrant.html" title="Persistence Statistics per Quadrant module"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="modules.html" title="Modules"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index.html">topological-bone-analysis  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="modules.html" >Modules</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Submodules</a></li> 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Ysanne Pritchard.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+</html>
