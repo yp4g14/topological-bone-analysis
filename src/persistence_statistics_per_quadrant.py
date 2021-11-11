@@ -13,7 +13,7 @@ def distribution_stats_column(df, dim, colname):
             e.g. "birth"
         dim : [0,1] dimension of persistence diagram df belongs to.
         colname : numeric column name as string in df to be summarized with
-             statistics.
+            statistics.
 
     Returns:
         dictionary: statistics keyed by {dim}_{statistic}_{colname}
@@ -51,9 +51,10 @@ def quadrant_statistics(
         dim (int): persistence diagram for dimension in [0,1]
         filename (string): [description]
         split_radius (int, optional): (for quadrant 2 dim 0 only)
-             will calculate the number of births less than value and
-             number of births greater than or equal to value.
-            Defaults to -2.
+        will calculate the number of births less than value and
+        number of births greater than or equal to value.
+        Defaults to -2.
+    
     Returns:
         pandas DataFrame: topological statistics calculated per quadrant.
     """

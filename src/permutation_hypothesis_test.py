@@ -207,26 +207,26 @@ def group_comparison_permutation_test(
 
     Args:
         name_maps (dict): keys are filenames as strings, values are categories 
-            as strings
+        as strings
         stat_df (pandas DataFrame): dataframe with filenames, patch numbers,
-            quadrant columns and their corresponding quadrant statistics 
-            each as a column.
+        quadrant columns and their corresponding quadrant statistics 
+        each as a column.
         save_path (string): location to save p_values.csv as string
         logger (logging.Loggger object): logging
         stats_list_to_test (list, optional): list of statistic names as strings
-            to test, if not specified will test all extraneous columns.
-             Defaults to None.
+        to test, if not specified will test all extraneous columns.
+        Defaults to None.
         metric_func (function, optional): measure to use for difference between
-             groups, usually the mean or median. Defaults to np.average.
+        groups, usually the mean or median. Defaults to np.average.
         plot_significant (bool, optional): Will plot the shuffled distributions
-            where significant if True, otherwise no plots are generated.
-             Defaults to False.
+        where significant if True, otherwise no plots are generated.
+        Defaults to False.
         adjust_p_vals (bool, optional): Whether to apply the Benjamini-Hochberg
-            p value adjustment, if True you must specify stats_list_to_test,
-            and it will adjust for all of these statistics only.
-            Defaults to True.
+        p value adjustment, if True you must specify stats_list_to_test,
+        and it will adjust for all of these statistics only.
+        Defaults to True.
         alpha (float, optional): overall significance level for p_value
-            adjustment. Defaults to 0.05.
+        adjustment. Defaults to 0.05.
 
     Returns:
         pandas DataFrame: p values (and adjusted if adjustment made)
