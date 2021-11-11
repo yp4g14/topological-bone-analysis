@@ -336,6 +336,7 @@ def plot_patch_scores(
     ax1.spines['top'].set_visible(False)        
     ax1.spines['left'].set_visible(True)
     ax1.spines['bottom'].set_visible(True)
+    ax1.set_title(f"Number of patches per value of {score_column}")
     tol=0.05 * bin_width
     ax1.set_xlim([bin_edges[0]-tol,bin_edges[-1]+5*tol])
     ax1 = plt.bar(
