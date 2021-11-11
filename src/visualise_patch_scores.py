@@ -347,7 +347,7 @@ def plot_patch_scores(
         edgecolor='k')
     
     if normalise_scores == 'no':
-        save_name = f"{image_name[:-4]}_{score_column}_{colour}.svg"
+        save_name = f"{image_name[:-4]}_{score_column}_{colour}.png"
     else:
         date = dt.datetime.now().strftime("%Y_%m_%d_Time_%H_%M")
         save_name = f"{image_name[:-4]}_{score_column}_{colour}_{date}_{normalise_scores}.png"
