@@ -87,6 +87,21 @@ def topological_porosity_analysis(
             (split_radius, 0]. Defaults to -2.
         save_persistence_diagrams (bool, optional): saves plots of persistence
              diagrams. Defaults to False.
+        analysis_plots (bool, optional): If True saves box plots comparing groups 
+            defined by filenames map. Defaults to False
+        classification (bool, optional). If True, a SVC will be used to classify
+            into groups (filenames_map) using the specified feature_cols, 
+            with runs, strat_col, cross_val and param_grid_SVC specifying 
+            parameters. Defaults to False.
+        feature_cols (list, optional). If None, will use all statistics. 
+            If list of string statistic names, will use specified. 
+        filenames_map (dict, optional) dictionary with each image filename 
+            (string) as keys, and a group name as values.
+        runs (optional, int). Number of training runs for SVC. Defaults to 100. 
+        strat_col (optional, string) column to stratify the kfold CV across.
+        cross_val (optional, string) Defaults to 'stratkfold'
+        param_grid_SVC (parameter grid to train SVC. Defaults to
+            {'C': [1,2,3], 'kernel': ('rbf','linear')}
 
     Returns:
         pandas DataFrame: topological statistics per quadrant for .tiff image 
@@ -282,52 +297,3 @@ def topological_porosity_analysis(
     logger.info("pipeline executed time(m): "
                 +str(round((time.time()-start_time)/60, 2)))
     return stats_df
-
-if __name__ == "__main__":
-    path = "D:/topological-bone-analysis/example/"
-    feature_cols = [
-        '0_num_points',
-        '0_avg_birth',
-        '0_stddev_birth',
-        '0_skew_birth',
-        '0_percentile_25_birth',
-        '0_percentile_75_birth',
-        '0_iqr_birth',
-        '0_avg_death',
-        '0_stddev_death',
-        '0_skew_death',
-        '0_percentile_25_death',
-        '0_percentile_75_death',
-        '0_iqr_death',
-        '0_pers_entropy',
-        '1_num_points',
-        '1_avg_birth',
-        '1_stddev_birth',
-        '1_skew_birth',
-        '1_percentile_25_birth',
-        '1_percentile_75_birth',
-        '1_iqr_birth',
-        '1_avg_death',
-        '1_stddev_death',
-        '1_skew_death',
-        '1_percentile_25_death',
-        '1_percentile_75_death',
-        '1_iqr_death',
-        '1_pers_entropy']
-    filenames_map = {'example_SHG_1.tif':'group_a', 'example_SHG_2.tif':'group_b'}
-
-    stats, results = topological_porosity_analysis(
-        path,
-        logger,
-        preprocess.otsu_threshold,
-        patch_shape=100,
-        stride=100,
-        save_persistence_diagrams=False,
-        classification=True,
-        feature_cols=feature_cols,
-        filenames_map=filenames_map,
-        runs=10,
-        strat_col=None,
-        cross_val='stratkfold',
-        param_grid_SVC = {'C': [1,2,3], 'kernel': ('rbf','linear')}
-    )

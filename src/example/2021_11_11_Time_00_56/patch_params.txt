@@ -1,0 +1,36 @@
+path: d:\topological-bone-analysis\src\example\2021_11_11_Time_00_56/
+patch shape: 100
+stride: 100
+percentage background: 1
+background threshold: 0
+image: example_ellipses_20_1.tif completed,                 9 patches saved,                 0 patches discarded
+path: d:\topological-bone-analysis\src\example\2021_11_11_Time_00_56/
+patch shape: 100
+stride: 100
+percentage background: 1
+background threshold: 0
+image: example_ellipses_20_2.tif completed,                 9 patches saved,                 0 patches discarded
+path: d:\topological-bone-analysis\src\example\2021_11_11_Time_00_56/
+patch shape: 100
+stride: 100
+percentage background: 1
+background threshold: 0
+image: example_ellipses_20_3.tif completed,                 9 patches saved,                 0 patches discarded
+path: d:\topological-bone-analysis\src\example\2021_11_11_Time_00_56/
+patch shape: 100
+stride: 100
+percentage background: 1
+background threshold: 0
+image: example_ellipses_60_1.tif completed,                 9 patches saved,                 0 patches discarded
+path: d:\topological-bone-analysis\src\example\2021_11_11_Time_00_56/
+patch shape: 100
+stride: 100
+percentage background: 1
+background threshold: 0
+image: example_ellipses_60_2.tif completed,                 9 patches saved,                 0 patches discarded
+path: d:\topological-bone-analysis\src\example\2021_11_11_Time_00_56/
+patch shape: 100
+stride: 100
+percentage background: 1
+background threshold: 0
+image: example_ellipses_60_3.tif completed,                 9 patches saved,                 0 patches discarded
