@@ -12,6 +12,19 @@ def prepare_features(
     filenames_map,
     strat_col=None,
 ):
+    """Prepares statistics dataframe for classification with SVM.
+    
+    Args:
+        stats (pandas DataFrame): should contain columns for category, filename,
+            patch_number
+        feature_cols (list): list of statistics as strings to use as features
+        filenames_map (dict): keys, values respectively should be filenames and
+            group idenitifiers
+        strat_col (string, optional): column to stratify on. Defaults to None.
+
+    Returns:
+        pandas DataFrame: features set for SVM
+    """
     stats['category'] = stats['filename'].map(filenames_map)
     categories = list(set(stats['category']))
     if len(categories)!=2:
@@ -49,6 +62,27 @@ def classification_one_v_one(
     cross_val='stratkfold',
     param_grid_SVC = {'C': [1,2,3], 'kernel': ('rbf','linear')}
 ):
+    """Fits a SVM using df, trains on feature_cols.
+
+    Args:
+        df (pandas DataFrame): data containing features
+        save_path (string): location to save results
+        logger (logging object)
+        feature_cols (list): string of feature columns to train on
+        filenames_map (dict): keys, values respectively should be filenames and
+            group idenitifiers
+        runs (int, optional): Number of runs over which to average results.
+            Defaults to 100.
+        strat_col (string, optional): column name to stratify train test split.
+            Defaults to None.
+        cross_val (str, optional): Type of cross validation to train test split.
+            Defaults to 'stratkfold'.
+        param_grid_SVC (dict, optional): parameter grid over which to optimise 
+            SVC. Defaults to {'C': [1,2,3], 'kernel': ('rbf','linear')}.
+
+    Returns:
+        pandas DataFrame: results
+    """
     features = prepare_features(
         df,
         feature_cols,

@@ -183,6 +183,7 @@ def plot_patch_scores(
     if len(patch_width)+len(patch_height) > 2:
         logger.error("Error: inconsistent patch shape")
     else:
+        logger.error(im_shape_x)
         im_shape_x = im_shape_x[0]
         im_shape_y = im_shape_y[0]
         patch_width = patch_width[0]
@@ -349,30 +350,10 @@ def plot_patch_scores(
         save_name = f"{image_name[:-4]}_{score_column}_{colour}.svg"
     else:
         date = dt.datetime.now().strftime("%Y_%m_%d_Time_%H_%M")
-        save_name = f"{image_name[:-4]}_{score_column}_{colour}_{date}_{normalise_scores}.svg"
+        save_name = f"{image_name[:-4]}_{score_column}_{colour}_{date}_{normalise_scores}.png"
 
-    #  save visualisation of scores to save_path as svg
+    #  save visualisation of scores to save_path as png
     plt.savefig(f"{save_path}{save_name}")
     plt.close()
     logger.info(f"Completed visualisation for {image_name}")        
     
-if __name__ == "__main__":
-
-    # create some test visualisations
-    run_path = "D:/topological-bone-analysis/example/2021_08_26_Time_13_38/"
-    image_path = run_path+"padded/"
-    patch_path = run_path+"patches/"
-    score_path = run_path+"all_statistics.csv"
-    save_path =  run_path+"visualisations/"
-    visualise_patch_scores(
-        image_path,
-        patch_path,
-        score_path,
-        save_path,
-        logger,
-        colour='Blues_r',
-        normalise_scores='no',
-        alpha=0.3,
-        score_column='0_avg_birth',
-        quadrant=2
-        )

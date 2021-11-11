@@ -10,6 +10,16 @@ def analysis_plots(
             plot_path,
             feature_cols
             ):
+    """Creates box plots to compare groups of statistics, using filenames_map.
+
+    Args:
+        df (pandas DataFrame): df containing filename, patch_number, quadrant,
+            category columns as well as any statistics columns you want to plot
+        filenames_map (dict): dictionary with keys containing filenames 
+            (strings) and values containing group id
+        plot_path (string): location to save plots as .svg
+        feature_cols (list): list of strings, statistic names to plot
+    """
     if feature_cols is None:
         identifiers = ['filename', 'patch_number', 'quadrant']
         feature_cols = [col for col in df.columns if col not in identifiers]
