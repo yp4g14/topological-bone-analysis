@@ -1,6 +1,7 @@
-Module: preprocessing images
-============================
+Preprocessing images module
+===========================
 
-.. automodule:: preprocessing_images
-    :members:
-    :undoc-members:
+.. automodule:: src.preprocessing_images
+   :members:
+   :undoc-members:
+   :show-inheritance:

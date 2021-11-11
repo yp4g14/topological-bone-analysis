@@ -1,6 +1,7 @@
-Module: persistent homology SEDT
-================================
+Persistent Homology SEDT module
+===============================
 
-.. automodule:: persistent_homology_SEDT
-    :members:
-    :undoc-members:
+.. automodule:: src.persistent_homology_SEDT
+   :members:
+   :undoc-members:
+   :show-inheritance:

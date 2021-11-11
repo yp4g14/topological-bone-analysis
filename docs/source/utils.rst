@@ -1,6 +1,7 @@
-Module: utils
-=============
+Utils module
+============
 
-.. automodule:: utils
-    :members:
-    :undoc-members:
+.. automodule:: src.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

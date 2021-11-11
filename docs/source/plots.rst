@@ -1,7 +1,7 @@
-Module: plots
-=============
-This module creates box plots to compare groups of statistics.
+Boxplots module
+===============
 
-.. automodule:: plots
-    :members:
-    :undoc-members:
+.. automodule:: src.plots
+   :members:
+   :undoc-members:
+   :show-inheritance:

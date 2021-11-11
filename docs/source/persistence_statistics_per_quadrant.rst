@@ -1,6 +1,7 @@
-Module: persistence statistics per quadrant
-===========================================
+Persistence Statistics per Quadrant module
+==========================================
 
-.. automodule:: persistence_statistics_per_quadrant
-    :members:
-    :undoc-members:
+.. automodule:: src.persistence_statistics_per_quadrant
+   :members:
+   :undoc-members:
+   :show-inheritance:

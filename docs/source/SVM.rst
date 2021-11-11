@@ -1,8 +1,7 @@
-Module: SVM
-===========
+SVM module
+==========
 
-This module contains a support vector machine for classification.
-
-.. automodule:: SVM
-    :members:
-    :undoc-members:
+.. automodule:: src.SVM
+   :members:
+   :undoc-members:
+   :show-inheritance:

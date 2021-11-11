@@ -1,9 +1,7 @@
-Module: run_process
-===================
+Run process module
+==================
 
-This module contains the run file to analyse a set of .tif images from start
- to  finish.
-
-.. automodule:: run_process
-    :members:
-    :undoc-members:
+.. automodule:: src.run_process
+   :members:
+   :undoc-members:
+   :show-inheritance:
