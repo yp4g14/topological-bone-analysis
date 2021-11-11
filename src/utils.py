@@ -72,7 +72,8 @@ def find_files(files_to_find, path, logger):
             found_files.append(file)
         else:
             files_not_found.append(file)
-    logger.warning(f"Files not found: {files_not_found}")
+    if len(files_not_found) >1:
+        logger.warning(f"Files not found: {files_not_found}")
     return found_files
 
 def combine_stats_files(
