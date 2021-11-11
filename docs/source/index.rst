@@ -12,7 +12,7 @@ to analyse 2D image files, with a patch-based approach.
 
 
 Contents
--------
+--------
 
 .. toctree::
    :maxdepth: 2
@@ -23,7 +23,9 @@ Contents
    persistence_statistics_per_quadrant
    utils
    visualise_patch_scores
+   plots
    permutation_hypothesis_test
+   SVM
 
 
 Indices and tables
