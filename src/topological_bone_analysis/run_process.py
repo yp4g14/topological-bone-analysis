@@ -5,24 +5,17 @@ from os.path import isfile, join, exists
 import logging
 import time
 import datetime as dt
-from importlib import reload
 import pandas as pd
 import numpy as np
 from PIL import Image
 
 # local imports
-import utils as ut
-import preprocessing_images as preprocess
-import persistent_homology_SEDT as ph
-import persistence_statistics_per_quadrant as stats
-import plots
-import SVM as svm
-reload(ut)
-reload(preprocess)
-reload(ph)
-reload(stats)
-reload(plots)
-reload(svm)
+from . import utils as ut
+from . import preprocessing_images as preprocess
+from . import persistent_homology_SEDT as ph
+from . import persistence_statistics_per_quadrant as stats
+from . import plots
+from . import SVM as svm
 
 # setup logging
 logger = logging.getLogger("run_porosity_analysis")

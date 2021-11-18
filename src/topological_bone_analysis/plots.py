@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-import utils as ut
+from . import utils as ut
 
 def analysis_plots(
             df,

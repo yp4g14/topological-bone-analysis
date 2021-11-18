@@ -8,12 +8,11 @@ import random
 import copy
 import pandas as pd
 import matplotlib.pyplot as plt
-import utils as ut
 import logging 
 from itertools import combinations, product
 from statsmodels.stats.multitest import multipletests
-from importlib import reload
-reload(ut)
+
+from . import utils as ut
 
 logger = logging.getLogger("significance")
 logger.setLevel(logging.DEBUG)

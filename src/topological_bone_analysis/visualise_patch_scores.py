@@ -2,7 +2,6 @@
 import logging
 from os.path import isfile, join
 from os import listdir
-from importlib import reload
 import numpy as np
 import pandas as pd
 import datetime as dt
@@ -15,8 +14,7 @@ from math import ceil, floor
 from matplotlib import gridspec
 from matplotlib import rcParams
 import datetime as dt
-import utils as ut
-reload(ut)
+from . import utils as ut
 
 logger = logging.getLogger("visualisation")
 logger.setLevel(logging.DEBUG)

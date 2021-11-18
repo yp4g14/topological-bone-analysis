@@ -7,10 +7,7 @@ from itertools import product
 from os import listdir
 from os.path import isfile, join
 from PIL import Image
-import utils as ut
-from importlib import reload
-reload(ut)
-
+from . import utils as ut
 def trim(
     image,
     edge_val=0
