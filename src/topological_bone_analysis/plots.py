@@ -36,9 +36,10 @@ def analysis_plots(
             single_stat = single_stat.dropna()
             if single_stat.shape[0] >= 2:
                 sns.catplot(x='category', y=col, data=single_stat, dodge=True)
-                plt.savefig(f"{plot_path}/Q{quadrant}/{col}.svg")
+                plt.savefig(f"{plot_path}/Q{quadrant}/cat_{col}.svg")
                 plt.close()
 
                 sns.boxplot(x='category', y=col, data=single_stat, dodge=True)
                 plt.savefig(f"{plot_path}Q{quadrant}/{col}.svg")
                 plt.close()
+

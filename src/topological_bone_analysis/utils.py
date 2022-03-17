@@ -123,3 +123,20 @@ def combine_stats_files(
     directory(save_path)
     stats_df.to_csv(f"{save_path}{save_name}")
     return stats_df
+
+def down_scale_image(im, factor=2):
+    og_shape = im.shape
+    div_len = im.shape[0] % factor
+    div_wid = im.shape[1] % factor
+    if div_len != 0:
+        print(f"droppping {div_len} rows")
+        im  = im[:-div_len,:]
+    if div_wid != 0:
+        print(f"droppping {div_wid} cols")
+        im = im[:,:-div_wid]
+    print(f"og shape {og_shape} \n new shape before downscale {im.shape}")
+
+    b=im.shape[0]//factor
+    smol_im = im.reshape(-1, factor, b, factor).sum((-1, -3)) / (factor**2)
+    print(f"final shape {smol_im.shape}")
+    return smol_im

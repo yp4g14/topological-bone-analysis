@@ -1,7 +1,7 @@
 Preprocessing images
 ====================
 
-.. automodule:: src.preprocessing_images
+.. automodule:: src.topological_bone_analysis.preprocessing_images
    :members:
    :undoc-members:
    :show-inheritance:

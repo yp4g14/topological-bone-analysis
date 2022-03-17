@@ -20,6 +20,12 @@ diagrams explain the porous characteristics in patches of the images.
 
 See example/example.ipynb for example use cases.
 
+Installation
+------------
+topological bone analysis can be installed from pypi, the packaging index
+
+``pip install topological-bone-analysis``
+
 Contents
 --------
 

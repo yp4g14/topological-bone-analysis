@@ -8,6 +8,8 @@ from os import listdir
 from os.path import isfile, join
 from PIL import Image
 from . import utils as ut
+from skimage.segmentation import flood
+
 def trim(
     image,
     edge_val=0
@@ -49,7 +51,7 @@ def otsu_threshold(
         binary_image (numpy array): binary ([0,1]) image (numpy array)
     """
     threshold_val = threshold_otsu(image)
-    binary_image = (image > threshold_val).astype(int)
+    binary_image = (image > threshold_val).astype(np.uint8)
     return binary_image
 
 def minimum_threshold(image):
@@ -180,6 +182,50 @@ def SEDT(
     sedt = neg+pos
     return sedt
 
+def SEDT_3(
+    image
+    ):
+    """
+    Calculates a Signed Euclidean Distance Transform of a binary image array.
+    Leaves any values that are connected to black corners (using flood) set to np.inf
+    
+    Technically before flooding adds one pixel deep border in black, to avoid erroneous white coreners, then floods, then removes this for final image
+
+    Args:
+        image : (numpy array) trinary image to transform.
+
+    Returns:
+        sedt_3 : (numpy array) SEDT 3 phase of image.
+    """
+
+    # pad image with border width 1 of value 0
+    image_to_flood = np.pad(image, ((1,1),(1,1)), 'constant', constant_values=0)
+    # flood from all black (0) corners
+    x,y = [0,0,-1,-1],[0,-1,0,-1]
+    all_floods = flood(image_to_flood, (x[0],y[0])).astype(int)
+    for i in range(1,4):
+        all_floods += flood(image_to_flood, (x[i],y[i])).astype(int)
+
+    all_floods = (all_floods>0).astype(int)
+    all_floods = np.where(all_floods == 1, -np.inf,1)
+    #trim off border we added above
+    all_floods = all_floods[1:-1,1:-1]
+    
+    #SEDT
+    inverse_image = np.logical_not(image).astype(int)
+    edt_1_to_0 = ndimage.distance_transform_edt(image)
+    edt_0_to_1 = ndimage.distance_transform_edt(inverse_image)
+
+    # negative distances for 0 (pore/air) to 1 (material)
+    edt_0_to_1 = - edt_0_to_1
+
+    # where image is True (material) replace the distance 
+    # with distance from material to pore/air
+    neg = np.multiply(inverse_image, edt_0_to_1)
+    pos = np.multiply(image, edt_1_to_0)
+    sedt = neg+pos
+    sedt_3 = sedt * all_floods
+    return sedt_3
 def image_to_patches(
     path,
     filename,

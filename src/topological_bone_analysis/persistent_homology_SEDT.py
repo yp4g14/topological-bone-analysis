@@ -59,3 +59,5 @@ def peristent_homology_sublevel_cubic(
                     f"{plot_path}PD_dim_{dim}_{idiagram_filename[:-9]}.svg"
                     )
                 plt.close()
+
+        del pd
